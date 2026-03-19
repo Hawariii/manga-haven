@@ -14,30 +14,38 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = User::create($request->validated());
-        $token = $user->createToken($request->userAgent() ?: 'manga-haven')->plainTextToken;
+        $user = User::create([
+            ...$request->validated(),
+            'role' => 'user',
+        ]);
 
-        return $this->successResponse([
-            'user' => new UserResource($user),
-            'token' => $token,
-        ], 'User registered successfully.', Response::HTTP_CREATED);
+        return $this->issueAuthResponse($user, $request->userAgent() ?: 'manga-haven', 'User registered successfully.', Response::HTTP_CREATED);
     }
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validated();
-        $user = User::where('email', $credentials['email'])->first();
+        $user = $this->attemptLogin($request);
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        if (! $user) {
             return $this->errorResponse('Invalid credentials.', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $token = $user->createToken($credentials['device_name'] ?? ($request->userAgent() ?: 'manga-haven'))->plainTextToken;
+        return $this->issueAuthResponse($user, $request->validated()['device_name'] ?? ($request->userAgent() ?: 'manga-haven'), 'Login successful.');
+    }
 
-        return $this->successResponse([
-            'user' => new UserResource($user),
-            'token' => $token,
-        ], 'Login successful.');
+    public function adminLogin(LoginRequest $request): JsonResponse
+    {
+        $user = $this->attemptLogin($request);
+
+        if (! $user) {
+            return $this->errorResponse('Invalid credentials.', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if ($user->role !== 'admin') {
+            return $this->errorResponse('Admin access only.', Response::HTTP_FORBIDDEN);
+        }
+
+        return $this->issueAuthResponse($user, $request->validated()['device_name'] ?? ($request->userAgent() ?: 'manga-haven-admin'), 'Admin login successful.');
     }
 
     public function logout(): JsonResponse
@@ -59,5 +67,27 @@ class AuthController extends Controller
         return $this->successResponse([
             'user' => new UserResource(request()->user()),
         ]);
+    }
+
+    private function attemptLogin(LoginRequest $request): ?User
+    {
+        $credentials = $request->validated();
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    private function issueAuthResponse(User $user, string $deviceName, string $message, int $status = 200): JsonResponse
+    {
+        $token = $user->createToken($deviceName)->plainTextToken;
+
+        return $this->successResponse([
+            'user' => new UserResource($user),
+            'token' => $token,
+        ], $message, $status);
     }
 }

@@ -5,6 +5,7 @@ import type { User } from "@/lib/types";
 const TOKEN_KEY = "manga_haven_token";
 const USER_KEY = "manga_haven_user";
 const COOKIE_KEY = "manga_haven_token";
+const ROLE_COOKIE_KEY = "manga_haven_role";
 
 export function getStoredToken() {
   if (typeof window === "undefined") {
@@ -44,13 +45,19 @@ export function getStoredUser() {
 
 export function setStoredUser(user: User) {
   window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+  document.cookie = `${ROLE_COOKIE_KEY}=${user.role}; path=/; max-age=2592000; samesite=lax`;
 }
 
 export function clearStoredUser() {
   window.localStorage.removeItem(USER_KEY);
+  document.cookie = `${ROLE_COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;
 }
 
 export function clearSession() {
   clearStoredToken();
   clearStoredUser();
+}
+
+export function isStoredAdmin() {
+  return getStoredUser()?.role === "admin";
 }

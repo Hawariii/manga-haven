@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -78,18 +79,45 @@ export default function ProfilePage() {
           </div>
 
           <div className="rounded-2xl border border-[var(--line)] bg-white/3 p-4 text-sm leading-6 text-[var(--muted)]">
-            Token Sanctum aktif terdeteksi di browser. Frontend siap dipakai untuk request terproteksi.
+            Login aktif sebagai <span className="font-semibold text-white">{user.role}</span>. Guest tetap hanya bisa baca manga publik.
           </div>
+
+          {user.role === "admin" ? (
+            <Link href="/admin/manga">
+              <Button className="w-full" variant="secondary">
+                Buka Admin Panel
+              </Button>
+            </Link>
+          ) : null}
 
           <Button variant="danger" className="w-full" onClick={() => void handleLogout()}>
             Logout
           </Button>
         </div>
       ) : (
-        <EmptyState
-          title="Mode tamu aktif"
-          description="Belum ada token login Sanctum di browser. Nanti setelah flow auth disambung, info user akan tampil di sini."
-        />
+        <div className="space-y-4">
+          <EmptyState
+            title="Mode tamu aktif"
+            description="Guest hanya bisa baca manga. Favorite dan history akan terbuka setelah login user."
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/login">
+              <Button className="w-full">Login User</Button>
+            </Link>
+            <Link href="/register">
+              <Button className="w-full" variant="secondary">
+                Register
+              </Button>
+            </Link>
+          </div>
+
+          <Link href="/admin/login">
+            <Button className="w-full" variant="secondary">
+              Login Admin
+            </Button>
+          </Link>
+        </div>
       )}
     </section>
   );

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/admin/login', [AuthController::class, 'adminLogin']);
 
 Route::get('/manga', [MangaController::class, 'index']);
 Route::get('/manga/{slug}', [MangaController::class, 'show']);
@@ -25,11 +26,13 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/favorites', [FavoriteController::class, 'store']);
     Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy']);
 
-    Route::post('/manga', [MangaController::class, 'store']);
-    Route::match(['put', 'patch'], '/manga/{manga}', [MangaController::class, 'update']);
-    Route::delete('/manga/{manga}', [MangaController::class, 'destroy']);
+    Route::middleware('admin')->group(function (): void {
+        Route::post('/manga', [MangaController::class, 'store']);
+        Route::match(['put', 'patch'], '/manga/{manga}', [MangaController::class, 'update']);
+        Route::delete('/manga/{manga}', [MangaController::class, 'destroy']);
 
-    Route::post('/manga/{manga}/chapters', [ChapterController::class, 'store']);
-    Route::match(['put', 'patch'], '/chapters/{chapter}', [ChapterController::class, 'update']);
-    Route::delete('/chapters/{chapter}', [ChapterController::class, 'destroy']);
+        Route::post('/manga/{manga}/chapters', [ChapterController::class, 'store']);
+        Route::match(['put', 'patch'], '/chapters/{chapter}', [ChapterController::class, 'update']);
+        Route::delete('/chapters/{chapter}', [ChapterController::class, 'destroy']);
+    });
 });
