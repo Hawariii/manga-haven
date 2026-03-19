@@ -1,65 +1,147 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useRef, useState } from "react";
+import { MangaCard } from "@/components/manga/MangaCard";
+import { MangaCardSkeleton } from "@/components/manga/MangaCardSkeleton";
+import { EmptyState } from "@/components/EmptyState";
+import { SectionHeading } from "@/components/SectionHeading";
+import { useToast } from "@/components/providers/ToastProvider";
+import { Button } from "@/components/ui/Button";
+import { api, getApiErrorMessage } from "@/lib/api";
+import type { ApiResponse, Manga, PaginatedData } from "@/lib/types";
+
+export default function HomePage() {
+  const [items, setItems] = useState<Manga[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  async function loadManga(nextPage: number) {
+    const isInitial = nextPage === 1;
+    setError(null);
+    isInitial ? setLoading(true) : setLoadingMore(true);
+
+    try {
+      const response = await api.get<ApiResponse<PaginatedData<Manga>>>("/manga", {
+        params: { page: nextPage, per_page: 8 },
+      });
+
+      const payload = response.data.data;
+      const newItems = payload.data ?? [];
+
+      setItems((current) => (isInitial ? newItems : [...current, ...newItems]));
+      setPage(payload.meta?.current_page ?? nextPage);
+      setHasMore(Boolean(payload.links?.next));
+    } catch (err) {
+      const message = getApiErrorMessage(err);
+      setError(message);
+      showToast(message, "error");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadManga(1);
+  }, []);
+
+  useEffect(() => {
+    if (!hasMore || loading || loadingMore || !sentinelRef.current) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          void loadManga(page + 1);
+        }
+      },
+      { rootMargin: "120px" },
+    );
+
+    observer.observe(sentinelRef.current);
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, page]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <section className="space-y-5">
+      <div className="gold-glow overflow-hidden rounded-[2rem] border border-yellow-300/10 bg-[linear-gradient(135deg,_rgba(255,218,97,0.16),_rgba(11,12,12,0.96)_45%)] p-5">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-[var(--gold)]">
+          Discover
+        </p>
+        <h2 className="mt-3 max-w-[14rem] text-[1.8rem] font-bold leading-9 text-white">
+          Donghua dan manga trending dalam satu layar.
+        </h2>
+        <p className="mt-3 max-w-[18rem] text-sm leading-6 text-[var(--muted)]">
+          Fokus mobile, cepat, dan enak dibaca. Scroll terus buat lihat rilisan terbaru.
+        </p>
+      </div>
+
+      <SectionHeading
+        eyebrow="Beranda"
+        title="Update Terbaru"
+        description="Grid 2 kolom dengan status tayang, chapter terbaru, dan total view."
+      />
+
+      {loading ? (
+        <div className="grid grid-cols-2 gap-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <MangaCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="space-y-4">
+          <EmptyState
+            title="Data manga belum bisa dimuat"
+            description={error}
+          />
+          <Button className="w-full" onClick={() => void loadManga(1)}>
+            Coba Lagi
+          </Button>
+        </div>
+      ) : items.length === 0 ? (
+        <EmptyState
+          title="Belum ada manga"
+          description="Begitu backend sudah terisi data, card manga akan tampil di sini."
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            {items.map((manga) => (
+              <MangaCard key={manga.id} manga={manga} />
+            ))}
+          </div>
+
+          {loadingMore && (
+            <div className="grid grid-cols-2 gap-4">
+              <MangaCardSkeleton />
+              <MangaCardSkeleton />
+            </div>
+          )}
+
+          {hasMore ? (
+            <div ref={sentinelRef} className="py-2">
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => void loadManga(page + 1)}
+              >
+                Muat Lagi
+              </Button>
+            </div>
+          ) : (
+            <p className="pb-2 text-center text-xs uppercase tracking-[0.28em] text-[var(--muted)]">
+              Semua data sudah tampil
+            </p>
+          )}
+        </>
+      )}
+    </section>
   );
 }

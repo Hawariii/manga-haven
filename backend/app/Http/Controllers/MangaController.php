@@ -15,7 +15,7 @@ class MangaController extends Controller
     public function index(Request $request): JsonResponse
     {
         $manga = Manga::query()
-            ->withCount('chapters')
+            ->withCount(['chapters', 'favorites'])
             ->with('latestChapter')
             ->when(
                 $request->filled('status'),
@@ -30,23 +30,24 @@ class MangaController extends Controller
     public function show(string $slug): JsonResponse
     {
         $manga = Manga::query()
-            ->withCount('chapters')
+            ->withCount(['chapters', 'favorites'])
             ->with(['chapters', 'latestChapter'])
             ->where('slug', $slug)
             ->firstOrFail();
 
         $manga->increment('views');
-        $manga->refresh()->loadCount('chapters')->load(['chapters', 'latestChapter']);
+        $manga->refresh()->loadCount(['chapters', 'favorites'])->load(['chapters', 'latestChapter']);
 
         return $this->successResponse(new MangaResource($manga));
     }
 
     public function topManga(Request $request): JsonResponse
     {
+        $sort = $request->string('sort', 'views')->toString();
         $manga = Manga::query()
-            ->withCount('chapters')
+            ->withCount(['chapters', 'favorites'])
             ->with('latestChapter')
-            ->orderByDesc('views')
+            ->orderByDesc($sort === 'favorites' ? 'favorites_count' : 'views')
             ->limit((int) $request->integer('limit', 10))
             ->get();
 
@@ -61,7 +62,7 @@ class MangaController extends Controller
         ]);
 
         return $this->successResponse(
-            new MangaResource($manga->loadCount('chapters')),
+            new MangaResource($manga->loadCount(['chapters', 'favorites'])),
             'Manga created successfully.',
             Response::HTTP_CREATED
         );
@@ -72,7 +73,7 @@ class MangaController extends Controller
         $manga->update($request->validated());
 
         return $this->successResponse(
-            new MangaResource($manga->refresh()->loadCount('chapters')),
+            new MangaResource($manga->refresh()->loadCount(['chapters', 'favorites'])),
             'Manga updated successfully.'
         );
     }

@@ -15,6 +15,7 @@ Route::get('/manga/{slug}', [MangaController::class, 'show']);
 Route::get('/top-manga', [MangaController::class, 'topManga']);
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/user', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/history', [HistoryController::class, 'index']);

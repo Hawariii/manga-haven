@@ -17,6 +17,7 @@ class MangaResource extends JsonResource
             'views' => $this->views,
             'status' => $this->status,
             'chapters_count' => $this->whenCounted('chapters'),
+            'favorites_count' => $this->whenCounted('favorites'),
             'latest_chapter' => new ChapterResource($this->whenLoaded('latestChapter')),
             'chapters' => ChapterResource::collection($this->whenLoaded('chapters')),
             'created_at' => $this->created_at?->toISOString(),
