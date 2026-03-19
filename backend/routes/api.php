@@ -1,0 +1,34 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\MangaController;
+use Illuminate\Support\Facades\Route;
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/manga', [MangaController::class, 'index']);
+Route::get('/manga/{slug}', [MangaController::class, 'show']);
+Route::get('/top-manga', [MangaController::class, 'topManga']);
+
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/history', [HistoryController::class, 'index']);
+    Route::post('/history', [HistoryController::class, 'store']);
+
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy']);
+
+    Route::post('/manga', [MangaController::class, 'store']);
+    Route::match(['put', 'patch'], '/manga/{manga}', [MangaController::class, 'update']);
+    Route::delete('/manga/{manga}', [MangaController::class, 'destroy']);
+
+    Route::post('/manga/{manga}/chapters', [ChapterController::class, 'store']);
+    Route::match(['put', 'patch'], '/chapters/{chapter}', [ChapterController::class, 'update']);
+    Route::delete('/chapters/{chapter}', [ChapterController::class, 'destroy']);
+});
