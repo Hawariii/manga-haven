@@ -1,10 +1,10 @@
 "use client";
 
 import { MenuIcon, SearchIcon } from "@/components/icons";
-import { useToast } from "@/components/providers/ToastProvider";
+import { useShellUi } from "@/components/providers/ShellUiProvider";
 
 export function NavbarTop() {
-  const { showToast } = useToast();
+  const { openMenu, openSearch } = useShellUi();
 
   return (
     <header className="glass-panel fixed inset-x-0 top-0 z-40 mx-auto flex max-w-md items-center justify-between rounded-b-[1.75rem] px-5 py-4">
@@ -20,14 +20,14 @@ export function NavbarTop() {
 
       <div className="flex items-center gap-2">
         <button
-          onClick={() => showToast("Pencarian akan kita sambung ke backend setelah UI utama beres.")}
+          onClick={openSearch}
           className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--line)] bg-white/4 text-[var(--gold)]"
           aria-label="Search"
         >
           <SearchIcon className="h-5 w-5" />
         </button>
         <button
-          onClick={() => showToast("Menu tambahan belum diaktifkan.")}
+          onClick={openMenu}
           className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--line)] bg-white/4 text-[var(--gold)]"
           aria-label="Menu"
         >

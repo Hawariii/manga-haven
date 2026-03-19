@@ -82,14 +82,6 @@ export default function ProfilePage() {
             Login aktif sebagai <span className="font-semibold text-white">{user.role}</span>. Guest tetap hanya bisa baca manga publik.
           </div>
 
-          {user.role === "admin" ? (
-            <Link href="/admin/manga">
-              <Button className="w-full" variant="secondary">
-                Buka Admin Panel
-              </Button>
-            </Link>
-          ) : null}
-
           <Button variant="danger" className="w-full" onClick={() => void handleLogout()}>
             Logout
           </Button>
@@ -111,12 +103,6 @@ export default function ProfilePage() {
               </Button>
             </Link>
           </div>
-
-          <Link href="/admin/login">
-            <Button className="w-full" variant="secondary">
-              Login Admin
-            </Button>
-          </Link>
         </div>
       )}
     </section>

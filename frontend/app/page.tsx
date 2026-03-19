@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { MangaCard } from "@/components/manga/MangaCard";
 import { MangaCardSkeleton } from "@/components/manga/MangaCardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
@@ -12,7 +13,7 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { api, getApiErrorMessage } from "@/lib/api";
 import type { ApiResponse, Manga, PaginatedData } from "@/lib/types";
 
-export default function HomePage() {
+function HomePageContent() {
   const [items, setItems] = useState<Manga[]>([]);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -22,7 +23,13 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const searchParams = useSearchParams();
   const debouncedQuery = useDebouncedValue(query, 450);
+
+  useEffect(() => {
+    const incomingQuery = searchParams.get("q") ?? "";
+    setQuery(incomingQuery);
+  }, [searchParams]);
 
   const loadManga = useCallback(async (nextPage: number) => {
     const isInitial = nextPage === 1;
@@ -165,5 +172,13 @@ export default function HomePage() {
         </>
       )}
     </section>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="h-40 animate-pulse rounded-[2rem] bg-white/6" />}>
+      <HomePageContent />
+    </Suspense>
   );
 }
