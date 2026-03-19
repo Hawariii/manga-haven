@@ -11,8 +11,13 @@ import {
   useState,
 } from "react";
 import { CloseIcon, HeartIcon, HistoryIcon, HomeIcon, TrophyIcon, UserIcon } from "@/components/icons";
+import { useToast } from "@/components/providers/ToastProvider";
 import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/search/SearchBar";
+import { api, getApiErrorMessage } from "@/lib/api";
+import { clearSession, getStoredUser } from "@/lib/auth";
+import { clearRecentSearches, getRecentSearches, saveRecentSearch } from "@/lib/recent-searches";
+import type { User } from "@/lib/types";
 
 type ShellUiContextType = {
   openSearch: () => void;
@@ -25,10 +30,18 @@ const ShellUiContext = createContext<ShellUiContextType | null>(null);
 export function ShellUiProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { showToast } = useToast();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const inputWrapRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setCurrentUser(getStoredUser());
+    setRecentSearches(getRecentSearches());
+  }, [pathname, searchOpen, menuOpen]);
 
   useEffect(() => {
     if (!searchOpen) {
@@ -47,9 +60,38 @@ export function ShellUiProvider({ children }: { children: React.ReactNode }) {
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const value = keyword.trim();
+
+    if (value) {
+      saveRecentSearch(value);
+      setRecentSearches(getRecentSearches());
+    }
+
     const target = value ? `/?q=${encodeURIComponent(value)}` : "/";
     router.push(target);
     closePanels();
+  }
+
+  function openSearchWithKeyword(value: string) {
+    const trimmed = value.trim();
+    setKeyword(trimmed);
+    saveRecentSearch(trimmed);
+    setRecentSearches(getRecentSearches());
+    router.push(`/?q=${encodeURIComponent(trimmed)}`);
+    closePanels();
+  }
+
+  async function handleLogout() {
+    try {
+      await api.post("/logout");
+    } catch (error) {
+      showToast(getApiErrorMessage(error), "error");
+    } finally {
+      clearSession();
+      setCurrentUser(null);
+      closePanels();
+      router.push("/profile");
+      showToast("Sesi login sudah ditutup.");
+    }
   }
 
   const value = useMemo(
@@ -73,6 +115,15 @@ export function ShellUiProvider({ children }: { children: React.ReactNode }) {
     { href: "/top-manga", label: "Top Manga", icon: TrophyIcon },
     { href: "/favorite", label: "Favorite", icon: HeartIcon },
     { href: "/profile", label: "Profile", icon: UserIcon },
+  ];
+
+  const genreShortcuts = [
+    "Action",
+    "Adventure",
+    "Fantasy",
+    "Martial Arts",
+    "Reincarnation",
+    "School",
   ];
 
   return (
@@ -134,6 +185,38 @@ export function ShellUiProvider({ children }: { children: React.ReactNode }) {
                 Reset
               </Button>
             </div>
+
+            {recentSearches.length ? (
+              <div className="rounded-[1.4rem] border border-[var(--line)] bg-white/3 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
+                    Recent Search
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearRecentSearches();
+                      setRecentSearches([]);
+                    }}
+                    className="text-xs font-semibold text-[var(--gold)]"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {recentSearches.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => openSearchWithKeyword(item)}
+                      className="rounded-full border border-[var(--line)] bg-white/4 px-3 py-1.5 text-xs text-white"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </form>
         </div>
       </div>
@@ -162,6 +245,39 @@ export function ShellUiProvider({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="space-y-2">
+            <div className="mb-3 rounded-[1.6rem] border border-[var(--line)] bg-white/4 p-4">
+              <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Akun</p>
+              {currentUser ? (
+                <>
+                  <p className="mt-2 text-sm font-semibold text-white">{currentUser.name}</p>
+                  <p className="text-xs text-[var(--muted)]">{currentUser.email}</p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="rounded-full bg-white/8 px-3 py-1 text-[0.68rem] uppercase tracking-[0.18em] text-[var(--gold)]">
+                      {currentUser.role}
+                    </span>
+                    <button
+                      onClick={() => void handleLogout()}
+                      className="text-xs font-semibold text-[#ff9b9b]"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="mt-2 text-sm font-semibold text-white">Mode Guest</p>
+                  <p className="text-xs leading-5 text-[var(--muted)]">
+                    Guest cuma bisa baca manga. Login buat buka history dan favorite.
+                  </p>
+                  <Link href="/profile" onClick={closePanels} className="mt-3 block">
+                    <Button className="w-full" variant="secondary">
+                      Buka Profile
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+
             {menuItems.map(({ href, label, icon: Icon }) => {
               const active = pathname === href;
 
@@ -181,16 +297,53 @@ export function ShellUiProvider({ children }: { children: React.ReactNode }) {
             })}
           </div>
 
-          <div className="mt-auto rounded-[1.6rem] border border-[var(--line)] bg-white/4 p-4">
-            <p className="text-sm font-semibold text-white">Guest bisa baca manga publik</p>
-            <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
-              Untuk favorite dan history, login lewat halaman profile.
-            </p>
-            <Link href="/profile" className="mt-4 block">
-              <Button className="w-full" variant="secondary" onClick={closePanels}>
-                Buka Profile
-              </Button>
-            </Link>
+          <div className="mt-5 rounded-[1.6rem] border border-[var(--line)] bg-white/4 p-4">
+            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Shortcut Genre</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {genreShortcuts.map((genre) => (
+                <button
+                  key={genre}
+                  onClick={() => openSearchWithKeyword(genre)}
+                  className="rounded-full border border-[var(--line)] bg-white/4 px-3 py-2 text-xs text-white"
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-[1.6rem] border border-[var(--line)] bg-white/4 p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Recent Search</p>
+              {recentSearches.length ? (
+                <button
+                  onClick={() => {
+                    clearRecentSearches();
+                    setRecentSearches([]);
+                  }}
+                  className="text-xs font-semibold text-[var(--muted)]"
+                >
+                  Clear
+                </button>
+              ) : null}
+            </div>
+            {recentSearches.length ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {recentSearches.map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => openSearchWithKeyword(item)}
+                    className="rounded-full border border-[var(--line)] bg-white/4 px-3 py-2 text-xs text-white"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
+                Belum ada pencarian terakhir. Pakai search buat menyimpan keyword di sini.
+              </p>
+            )}
           </div>
         </aside>
       </div>
