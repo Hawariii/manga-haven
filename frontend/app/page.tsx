@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MangaCard } from "@/components/manga/MangaCard";
 import { MangaCardSkeleton } from "@/components/manga/MangaCardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { SectionHeading } from "@/components/SectionHeading";
 import { useToast } from "@/components/providers/ToastProvider";
+import { SearchBar } from "@/components/search/SearchBar";
 import { Button } from "@/components/ui/Button";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { api, getApiErrorMessage } from "@/lib/api";
 import type { ApiResponse, Manga, PaginatedData } from "@/lib/types";
 
 export default function HomePage() {
   const [items, setItems] = useState<Manga[]>([]);
+  const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -19,15 +22,21 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const debouncedQuery = useDebouncedValue(query, 450);
 
-  async function loadManga(nextPage: number) {
+  const loadManga = useCallback(async (nextPage: number) => {
     const isInitial = nextPage === 1;
     setError(null);
-    isInitial ? setLoading(true) : setLoadingMore(true);
+
+    if (isInitial) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
 
     try {
       const response = await api.get<ApiResponse<PaginatedData<Manga>>>("/manga", {
-        params: { page: nextPage, per_page: 8 },
+        params: { page: nextPage, per_page: 8, q: debouncedQuery || undefined },
       });
 
       const payload = response.data.data;
@@ -44,11 +53,14 @@ export default function HomePage() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }
+  }, [debouncedQuery, showToast]);
 
   useEffect(() => {
+    setItems([]);
+    setHasMore(true);
+    setPage(1);
     void loadManga(1);
-  }, []);
+  }, [loadManga]);
 
   useEffect(() => {
     if (!hasMore || loading || loadingMore || !sentinelRef.current) {
@@ -67,7 +79,7 @@ export default function HomePage() {
     observer.observe(sentinelRef.current);
 
     return () => observer.disconnect();
-  }, [hasMore, loading, loadingMore, page]);
+  }, [hasMore, loading, loadingMore, loadManga, page]);
 
   return (
     <section className="space-y-5">
@@ -89,6 +101,12 @@ export default function HomePage() {
         description="Grid 2 kolom dengan status tayang, chapter terbaru, dan total view."
       />
 
+      <SearchBar
+        value={query}
+        onChange={setQuery}
+        placeholder="Cari manga favoritmu..."
+      />
+
       {loading ? (
         <div className="grid grid-cols-2 gap-4">
           {Array.from({ length: 6 }).map((_, index) => (
@@ -108,7 +126,11 @@ export default function HomePage() {
       ) : items.length === 0 ? (
         <EmptyState
           title="Belum ada manga"
-          description="Begitu backend sudah terisi data, card manga akan tampil di sini."
+          description={
+            debouncedQuery
+              ? "Tidak ada hasil yang cocok dengan kata kunci yang kamu cari."
+              : "Begitu backend sudah terisi data, card manga akan tampil di sini."
+          }
         />
       ) : (
         <>

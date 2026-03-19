@@ -8,6 +8,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { useToast } from "@/components/providers/ToastProvider";
 import { api, getApiErrorMessage } from "@/lib/api";
 import { getStoredToken } from "@/lib/auth";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import type { ApiResponse, HistoryItem, PaginatedData } from "@/lib/types";
 
 export default function HistoryPage() {
@@ -15,6 +16,7 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
+  const { isChecking } = useAuthGuard();
 
   useEffect(() => {
     async function loadHistory() {
@@ -37,6 +39,10 @@ export default function HistoryPage() {
 
     void loadHistory();
   }, [showToast]);
+
+  if (isChecking) {
+    return <div className="h-40 animate-pulse rounded-[2rem] bg-white/6" />;
+  }
 
   return (
     <section className="space-y-5">

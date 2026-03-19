@@ -4,6 +4,7 @@ import type { User } from "@/lib/types";
 
 const TOKEN_KEY = "manga_haven_token";
 const USER_KEY = "manga_haven_user";
+const COOKIE_KEY = "manga_haven_token";
 
 export function getStoredToken() {
   if (typeof window === "undefined") {
@@ -15,10 +16,12 @@ export function getStoredToken() {
 
 export function setStoredToken(token: string) {
   window.localStorage.setItem(TOKEN_KEY, token);
+  document.cookie = `${COOKIE_KEY}=${token}; path=/; max-age=2592000; samesite=lax`;
 }
 
 export function clearStoredToken() {
   window.localStorage.removeItem(TOKEN_KEY);
+  document.cookie = `${COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;
 }
 
 export function getStoredUser() {

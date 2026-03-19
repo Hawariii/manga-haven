@@ -1,0 +1,159 @@
+"use client";
+
+import Image from "next/image";
+import { use, useEffect, useState } from "react";
+import { EyeIcon, HeartIcon } from "@/components/icons";
+import { EmptyState } from "@/components/EmptyState";
+import { SectionHeading } from "@/components/SectionHeading";
+import { useToast } from "@/components/providers/ToastProvider";
+import { Button } from "@/components/ui/Button";
+import { api, getApiErrorMessage } from "@/lib/api";
+import { getStoredToken } from "@/lib/auth";
+import { formatStatus, formatViews } from "@/lib/format";
+import type { ApiResponse, Manga } from "@/lib/types";
+
+type MangaDetailPageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export default function MangaDetailPage({ params }: MangaDetailPageProps) {
+  const { slug } = use(params);
+  const [manga, setManga] = useState<Manga | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (!slug) {
+      return;
+    }
+
+    async function loadDetail() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await api.get<ApiResponse<Manga>>(`/manga/${slug}`);
+        setManga(response.data.data);
+      } catch (err) {
+        const message = getApiErrorMessage(err);
+        setError(message);
+        showToast(message, "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadDetail();
+  }, [showToast, slug]);
+
+  async function handleFavorite() {
+    if (!manga) {
+      return;
+    }
+
+    if (!getStoredToken()) {
+      showToast("Login dulu untuk menambahkan favorite.", "error");
+      return;
+    }
+
+    try {
+      await api.post("/favorites", { manga_id: manga.id });
+      showToast("Manga berhasil ditambahkan ke favorite.");
+    } catch (err) {
+      showToast(getApiErrorMessage(err), "error");
+    }
+  }
+
+  async function handleSaveHistory(chapterId: number) {
+    if (!manga || !getStoredToken()) {
+      showToast("Login dulu untuk menyimpan history.", "error");
+      return;
+    }
+
+    try {
+      await api.post("/history", { manga_id: manga.id, last_chapter: chapterId });
+      showToast("History terakhir baca berhasil disimpan.");
+    } catch (err) {
+      showToast(getApiErrorMessage(err), "error");
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="space-y-4">
+        <div className="aspect-[1.25] animate-pulse rounded-[2rem] bg-white/6" />
+        <div className="h-6 w-2/3 animate-pulse rounded-full bg-white/6" />
+        <div className="h-4 w-full animate-pulse rounded-full bg-white/6" />
+      </section>
+    );
+  }
+
+  if (error || !manga) {
+    return <EmptyState title="Manga tidak ditemukan" description={error ?? "Slug tidak valid."} />;
+  }
+
+  return (
+    <section className="space-y-5">
+      <div className="relative aspect-[1.1] overflow-hidden rounded-[2rem] border border-[var(--line)] bg-[var(--surface)]">
+        {manga.cover ? (
+          <Image
+            src={manga.cover}
+            alt={manga.title}
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <p className="text-[0.68rem] uppercase tracking-[0.32em] text-[var(--gold)]">Detail</p>
+          <h1 className="mt-2 text-2xl font-bold text-white">{manga.title}</h1>
+          <div className="mt-3 flex items-center gap-3 text-sm text-[var(--muted)]">
+            <span className="rounded-full bg-[var(--green)] px-3 py-1 text-xs font-semibold text-white">
+              {formatStatus(manga.status)}
+            </span>
+            <span className="flex items-center gap-1">
+              <EyeIcon className="h-4 w-4 text-[var(--gold)]" />
+              {formatViews(manga.views)} views
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Button onClick={() => void handleFavorite()} className="w-full">
+          <HeartIcon className="mr-2 h-4 w-4" />
+          Favorite
+        </Button>
+        <Button variant="secondary" className="w-full">
+          Slug: {manga.slug}
+        </Button>
+      </div>
+
+      <SectionHeading
+        eyebrow="Chapters"
+        title="Daftar Chapter"
+        description="Rute halaman ini sudah SEO-friendly karena memakai slug manga."
+      />
+
+      <div className="space-y-3">
+        {manga.chapters?.map((chapter) => (
+          <button
+            key={chapter.id}
+            onClick={() => void handleSaveHistory(chapter.id)}
+            className="flex w-full items-center justify-between rounded-[1.4rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-4 text-left"
+          >
+            <div>
+              <p className="text-sm font-semibold text-white">{chapter.title}</p>
+              <p className="mt-1 text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
+                Chapter {chapter.number}
+              </p>
+            </div>
+            <span className="text-xs font-semibold text-[var(--gold)]">Simpan</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}

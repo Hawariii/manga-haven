@@ -18,6 +18,15 @@ class MangaController extends Controller
             ->withCount(['chapters', 'favorites'])
             ->with('latestChapter')
             ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where(function ($builder) use ($request) {
+                    $search = $request->string('q')->toString();
+                    $builder
+                        ->where('title', 'like', "%{$search}%")
+                        ->orWhere('slug', 'like', "%{$search}%");
+                })
+            )
+            ->when(
                 $request->filled('status'),
                 fn ($query) => $query->where('status', $request->string('status'))
             )

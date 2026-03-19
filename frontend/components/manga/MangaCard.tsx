@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { EyeIcon } from "@/components/icons";
 import { formatStatus, formatViews } from "@/lib/format";
@@ -9,14 +10,16 @@ export function MangaCard({ manga }: { manga: Manga }) {
   const hasCover = Boolean(manga.cover);
 
   return (
-    <article className="overflow-hidden rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] shadow-[0_18px_40px_rgba(0,0,0,0.32)]">
+    <Link
+      href={`/manga/${manga.slug}`}
+      className="block overflow-hidden rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] shadow-[0_18px_40px_rgba(0,0,0,0.32)]"
+    >
       <div className="relative aspect-[0.78] overflow-hidden rounded-b-[1.2rem] bg-neutral-900">
         {hasCover ? (
           <Image
             src={manga.cover}
             alt={manga.title}
             fill
-            unoptimized
             className="object-cover"
             sizes="(max-width: 768px) 50vw, 240px"
           />
@@ -50,6 +53,6 @@ export function MangaCard({ manga }: { manga: Manga }) {
           <span>{manga.favorites_count ?? 0} fav</span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

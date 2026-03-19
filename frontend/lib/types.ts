@@ -48,6 +48,8 @@ export type ApiResponse<T> = {
 export type PaginatedData<T> = {
   data: T[];
   links?: {
+    first?: string | null;
+    last?: string | null;
     next?: string | null;
     prev?: string | null;
   };
