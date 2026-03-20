@@ -3,6 +3,7 @@ import { JetBrains_Mono, Sora } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const sora = Sora({
   variable: "--font-display",
@@ -27,9 +28,11 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${sora.variable} ${jetbrainsMono.variable} h-full`}>
       <body className="min-h-full">
-        <ToastProvider>
-          <AppShell>{children}</AppShell>
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <AppShell>{children}</AppShell>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -5,6 +5,7 @@
   --background-soft: #111313;
   --surface: #171919;
   --surface-2: #1d2020;
+  --surface-3: #242727;
   --foreground: #f6f2df;
   --muted: #9ca08d;
   --line: rgba(255, 237, 148, 0.12);
@@ -12,6 +13,27 @@
   --gold-strong: #ffd54a;
   --green: #1bc986;
   --danger: #ff6b6b;
+  --hero-start: rgba(255, 218, 97, 0.16);
+  --hero-end: rgba(11, 12, 12, 0.96);
+  --page-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="light"] {
+  --background: #f4efe2;
+  --background-soft: #ebe4d4;
+  --surface: #fffaf0;
+  --surface-2: #f2ebdb;
+  --surface-3: #e8dfcc;
+  --foreground: #1f1a12;
+  --muted: #766e5f;
+  --line: rgba(125, 95, 22, 0.14);
+  --gold: #c69116;
+  --gold-strong: #a96b00;
+  --green: #148d60;
+  --danger: #c64d4d;
+  --hero-start: rgba(198, 145, 22, 0.14);
+  --hero-end: rgba(255, 249, 239, 0.96);
+  --page-shadow: 0 20px 60px rgba(72, 53, 18, 0.12);
 }
 
 @theme inline {
@@ -31,6 +53,10 @@ html {
   color-scheme: dark;
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
 body,
 html {
   margin: 0;
@@ -42,8 +68,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
   background-image:
-    radial-gradient(circle at top, rgba(244, 200, 76, 0.16), transparent 28%),
-    radial-gradient(circle at bottom, rgba(27, 201, 134, 0.08), transparent 22%);
+    radial-gradient(circle at top, color-mix(in srgb, var(--gold) 18%, transparent), transparent 28%),
+    radial-gradient(circle at bottom, color-mix(in srgb, var(--green) 10%, transparent), transparent 22%);
 }
 
 a {
@@ -69,11 +95,11 @@ select {
   margin: 0 auto;
   position: relative;
   background:
-    linear-gradient(180deg, rgba(255, 214, 74, 0.04), rgba(255, 214, 74, 0)),
-    linear-gradient(180deg, #0c0d0d 0%, #0a0b0b 100%);
+    linear-gradient(180deg, color-mix(in srgb, var(--gold) 4%, transparent), color-mix(in srgb, var(--gold) 0%, transparent)),
+    linear-gradient(180deg, var(--background-soft) 0%, var(--background) 100%);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 20px 60px rgba(0, 0, 0, 0.35);
+    0 0 0 1px color-mix(in srgb, var(--foreground) 4%, transparent),
+    var(--page-shadow);
 }
 
 .content-safe {
@@ -82,13 +108,24 @@ select {
 }
 
 .glass-panel {
-  background: rgba(18, 20, 20, 0.88);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(16px);
   border: 1px solid var(--line);
 }
 
 .gold-glow {
   box-shadow: 0 10px 30px rgba(244, 200, 76, 0.18);
+}
+
+.desktop-shell {
+  width: min(100%, 86rem);
+  margin: 0 auto;
+}
+
+.desktop-sidebar {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent),
+    linear-gradient(180deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 82%, transparent) 100%);
 }
 
 .line-clamp-2 {
@@ -121,4 +158,17 @@ select {
 
 .toast-in {
   animation: toast-in 180ms ease-out;
+}
+
+@media (min-width: 1024px) {
+  .app-frame {
+    max-width: none;
+    min-height: calc(100vh - 2rem);
+    border-radius: 2rem;
+  }
+
+  .content-safe {
+    padding-top: 7rem;
+    padding-bottom: 2rem;
+  }
 }

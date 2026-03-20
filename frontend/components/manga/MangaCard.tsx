@@ -12,7 +12,7 @@ export function MangaCard({ manga }: { manga: Manga }) {
   return (
     <Link
       href={`/manga/${manga.slug}`}
-      className="block overflow-hidden rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] shadow-[0_18px_40px_rgba(0,0,0,0.32)]"
+      className="block overflow-hidden rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] shadow-[0_18px_40px_rgba(0,0,0,0.12)] transition hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
     >
       <div className="relative aspect-[0.78] overflow-hidden rounded-b-[1.2rem] bg-neutral-900">
         {hasCover ? (
@@ -41,7 +41,7 @@ export function MangaCard({ manga }: { manga: Manga }) {
       </div>
 
       <div className="space-y-2 px-3.5 pb-4 pt-3.5">
-        <h3 className="line-clamp-2 min-h-[2.75rem] text-sm font-semibold leading-5 text-white">
+        <h3 className="line-clamp-2 min-h-[2.75rem] text-sm font-semibold leading-5 text-[var(--foreground)]">
           {manga.title}
         </h3>
 

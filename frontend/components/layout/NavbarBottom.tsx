@@ -16,7 +16,7 @@ export function NavbarBottom() {
   const pathname = usePathname();
 
   return (
-    <nav className="glass-panel fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md rounded-t-[1.75rem] px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+    <nav className="glass-panel fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md rounded-t-[1.75rem] px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 lg:hidden">
       <div className="grid grid-cols-5 gap-1">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;

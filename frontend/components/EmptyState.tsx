@@ -12,7 +12,7 @@ export function EmptyState({
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/6 text-[var(--gold)]">
         <SparkIcon className="h-6 w-6" />
       </div>
-      <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
+      <h3 className="mt-4 text-lg font-semibold text-[var(--foreground)]">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{description}</p>
     </div>
   );

@@ -90,16 +90,35 @@ function HomePageContent() {
 
   return (
     <section className="space-y-5">
-      <div className="gold-glow overflow-hidden rounded-[2rem] border border-yellow-300/10 bg-[linear-gradient(135deg,_rgba(255,218,97,0.16),_rgba(11,12,12,0.96)_45%)] p-5">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-[var(--gold)]">
-          Discover
-        </p>
-        <h2 className="mt-3 max-w-[14rem] text-[1.8rem] font-bold leading-9 text-white">
-          Donghua dan manga trending dalam satu layar.
-        </h2>
-        <p className="mt-3 max-w-[18rem] text-sm leading-6 text-[var(--muted)]">
-          Fokus mobile, cepat, dan enak dibaca. Scroll terus buat lihat rilisan terbaru.
-        </p>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(18rem,0.8fr)]">
+        <div className="gold-glow overflow-hidden rounded-[2rem] border border-yellow-300/10 bg-[linear-gradient(135deg,var(--hero-start),var(--hero-end)_45%)] p-5 lg:p-7">
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-[var(--gold)]">
+            Discover
+          </p>
+          <h2 className="mt-3 max-w-[22rem] text-[1.8rem] font-bold leading-9 text-[var(--foreground)] lg:max-w-[32rem] lg:text-[3rem] lg:leading-[1.08]">
+            Donghua dan manga trending dalam satu layar.
+          </h2>
+          <p className="mt-3 max-w-[26rem] text-sm leading-6 text-[var(--muted)] lg:text-base">
+            Fokus mobile, cepat, dan enak dibaca. Sekarang desktop juga punya kanvas lebar untuk eksplor daftar update, top manga, dan detail chapter tanpa rasa sempit.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
+            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Library</p>
+            <p className="mt-3 text-3xl font-bold text-[var(--foreground)]">{items.length}</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+              item tampil di halaman ini berdasarkan hasil search dan pagination aktif.
+            </p>
+          </div>
+          <div className="rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
+            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Experience</p>
+            <p className="mt-3 text-lg font-semibold text-[var(--foreground)]">Desktop + Mobile</p>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+              Dark/light mode, global search overlay, drawer menu, dan grid responsif sekarang menyatu di satu shell.
+            </p>
+          </div>
+        </div>
       </div>
 
       <SectionHeading
@@ -141,7 +160,7 @@ function HomePageContent() {
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
             {items.map((manga) => (
               <MangaCard key={manga.id} manga={manga} />
             ))}

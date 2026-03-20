@@ -13,7 +13,7 @@ export function SectionHeading({
         {eyebrow}
       </p>
       <div>
-        <h2 className="text-[1.35rem] font-bold text-white">{title}</h2>
+        <h2 className="text-[1.35rem] font-bold text-[var(--foreground)] lg:text-[1.55rem]">{title}</h2>
         <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{description}</p>
       </div>
     </div>
