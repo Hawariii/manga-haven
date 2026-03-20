@@ -21,16 +21,16 @@ function DesktopSidebar() {
   const { theme } = useTheme();
 
   return (
-    <aside className="desktop-sidebar hidden lg:flex lg:min-h-[calc(100vh-2rem)] lg:w-[18rem] lg:flex-col lg:rounded-[2rem] lg:border lg:border-[var(--line)] lg:p-6 lg:shadow-[var(--page-shadow)]">
-      <div className="mb-8 flex items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-[1.4rem] bg-[radial-gradient(circle_at_top,_rgba(255,228,128,0.35),_rgba(255,194,77,0.08))] ring-1 ring-yellow-300/20">
-          <span className="text-xl font-black text-[var(--gold-strong)]">M</span>
-        </div>
+    <aside className="desktop-sidebar hidden lg:sticky lg:top-28 lg:flex lg:w-[14.5rem] lg:flex-col lg:self-start lg:rounded-[2rem] lg:border lg:border-[var(--line)] lg:p-5 lg:shadow-[var(--page-shadow)]">
+      <div className="mb-5">
         <div>
           <p className="text-[0.68rem] uppercase tracking-[0.32em] text-[var(--muted)]">Manga Haven</p>
-          <h2 className="mt-1 text-xl font-bold text-[var(--foreground)]">
+          <h2 className="mt-2 text-lg font-bold text-[var(--foreground)]">
             Desktop {theme === "dark" ? "Night" : "Paper"}
           </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+            Navigasi cepat untuk layar lebar tanpa nuansa viewport mobile.
+          </p>
         </div>
       </div>
 
@@ -55,14 +55,12 @@ function DesktopSidebar() {
         })}
       </nav>
 
-      <div className="mt-auto space-y-4">
-        <div className="rounded-[1.5rem] border border-[var(--line)] bg-white/4 p-4">
-          <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Workspace</p>
-          <h3 className="mt-2 text-lg font-semibold text-[var(--foreground)]">Desktop Ready</h3>
-          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-            Layout desktop sekarang punya rail kiri permanen, kanvas lebar, dan navigasi yang nggak lagi terasa seperti viewport mobile yang diperbesar.
-          </p>
-        </div>
+      <div className="mt-5 rounded-[1.5rem] border border-[var(--line)] bg-white/4 p-4">
+        <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Workspace</p>
+        <h3 className="mt-2 text-base font-semibold text-[var(--foreground)]">Clean Layout</h3>
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+          Sidebar dipadatkan supaya fokus tetap ke library, bukan ke ruang kosong.
+        </p>
       </div>
     </aside>
   );
@@ -71,9 +69,9 @@ function DesktopSidebar() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <ShellUiProvider>
-      <div className="min-h-screen px-0 lg:px-4 lg:py-4">
+      <div className="min-h-screen px-0 lg:px-5 lg:py-5">
         <NavbarTop />
-        <div className="desktop-shell lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-6">
+        <div className="desktop-shell lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)] lg:gap-5">
           <DesktopSidebar />
           <div className="app-frame">
             <main className="content-safe px-4 lg:px-6">{children}</main>

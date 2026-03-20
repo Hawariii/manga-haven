@@ -90,51 +90,72 @@ function HomePageContent() {
 
   return (
     <section className="space-y-5">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(18rem,0.8fr)]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.72fr)]">
         <div className="gold-glow overflow-hidden rounded-[2rem] border border-yellow-300/10 bg-[linear-gradient(135deg,var(--hero-start),var(--hero-end)_45%)] p-5 lg:p-7">
           <p className="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-[var(--gold)]">
             Discover
           </p>
-          <h2 className="mt-3 max-w-[22rem] text-[1.8rem] font-bold leading-9 text-[var(--foreground)] lg:max-w-[32rem] lg:text-[3rem] lg:leading-[1.08]">
+          <h2 className="mt-3 max-w-[22rem] text-[1.8rem] font-bold leading-9 text-[var(--foreground)] lg:max-w-[38rem] lg:text-[3.3rem] lg:leading-[1.02]">
             Donghua dan manga trending dalam satu layar.
           </h2>
-          <p className="mt-3 max-w-[26rem] text-sm leading-6 text-[var(--muted)] lg:text-base">
-            Fokus mobile, cepat, dan enak dibaca. Sekarang desktop juga punya kanvas lebar untuk eksplor daftar update, top manga, dan detail chapter tanpa rasa sempit.
+          <p className="mt-4 max-w-[33rem] text-sm leading-6 text-[var(--muted)] lg:text-base">
+            Fokus mobile, cepat, dan enak dibaca. Di desktop, layout sekarang lebih padat, lebih lebar, dan lebih terasa seperti produk web sungguhan.
           </p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-[1.4rem] border border-[var(--line)] bg-white/5 p-4">
+              <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--gold)]">Responsive</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--foreground)]">Mobile dan desktop pakai komposisi layout yang berbeda.</p>
+            </div>
+            <div className="rounded-[1.4rem] border border-[var(--line)] bg-white/5 p-4">
+              <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--gold)]">Search</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--foreground)]">Search bar dan overlay tetap sinkron ke query URL.</p>
+            </div>
+            <div className="rounded-[1.4rem] border border-[var(--line)] bg-white/5 p-4">
+              <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--gold)]">Theme</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--foreground)]">Dark dan light mode aktif global dari shell.</p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <div className="rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
             <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Library</p>
-            <p className="mt-3 text-3xl font-bold text-[var(--foreground)]">{items.length}</p>
+            <p className="mt-3 text-4xl font-bold text-[var(--foreground)]">{items.length}</p>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              item tampil di halaman ini berdasarkan hasil search dan pagination aktif.
+              item tampil berdasarkan hasil search dan pagination yang aktif saat ini.
             </p>
           </div>
           <div className="rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
-            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Experience</p>
-            <p className="mt-3 text-lg font-semibold text-[var(--foreground)]">Desktop + Mobile</p>
+            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Status</p>
+            <p className="mt-3 text-lg font-semibold text-[var(--foreground)]">
+              {query ? "Search Active" : "Browse Mode"}
+            </p>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              Dark/light mode, global search overlay, drawer menu, dan grid responsif sekarang menyatu di satu shell.
+              {query
+                ? `Menampilkan hasil untuk kata kunci "${query}".`
+                : "Menampilkan daftar update terbaru tanpa filter pencarian."}
             </p>
           </div>
         </div>
       </div>
 
-      <SectionHeading
-        eyebrow="Beranda"
-        title="Update Terbaru"
-        description="Grid 2 kolom dengan status tayang, chapter terbaru, dan total view."
-      />
-
-      <SearchBar
-        value={query}
-        onChange={setQuery}
-        placeholder="Cari manga favoritmu..."
-      />
+      <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,25rem)] lg:items-end">
+          <SectionHeading
+            eyebrow="Beranda"
+            title="Update Terbaru"
+            description="Grid responsif dengan status tayang, chapter terbaru, total view, dan hasil search yang langsung sinkron ke backend."
+          />
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            placeholder="Cari manga favoritmu..."
+          />
+        </div>
+      </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
           {Array.from({ length: 6 }).map((_, index) => (
             <MangaCardSkeleton key={index} />
           ))}
@@ -167,7 +188,7 @@ function HomePageContent() {
           </div>
 
           {loadingMore && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
               <MangaCardSkeleton />
               <MangaCardSkeleton />
             </div>

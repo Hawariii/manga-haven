@@ -118,7 +118,7 @@ select {
 }
 
 .desktop-shell {
-  width: min(100%, 86rem);
+  width: min(100%, 92rem);
   margin: 0 auto;
 }
 
@@ -163,12 +163,12 @@ select {
 @media (min-width: 1024px) {
   .app-frame {
     max-width: none;
-    min-height: calc(100vh - 2rem);
-    border-radius: 2rem;
+    min-height: calc(100vh - 6rem);
+    border-radius: 2.2rem;
   }
 
   .content-safe {
-    padding-top: 7rem;
-    padding-bottom: 2rem;
+    padding-top: 7.25rem;
+    padding-bottom: 2.5rem;
   }
 }
