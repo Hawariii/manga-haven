@@ -43,31 +43,41 @@ export default function TopMangaPage() {
 
   return (
     <section className="space-y-5">
-      <SectionHeading
-        eyebrow="Top Manga"
-        title="Peringkat Paling Panas"
-        description="Switch ranking berdasarkan total views atau jumlah favorite user."
-      />
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6">
+          <SectionHeading
+            eyebrow="Top Manga"
+            title="Peringkat Paling Panas"
+            description="Switch ranking berdasarkan total views atau jumlah favorite user."
+          />
+        </div>
 
-      <div className="flex gap-2">
-        <Button
-          className="flex-1"
-          variant={sort === "views" ? "primary" : "secondary"}
-          onClick={() => setSort("views")}
-        >
-          Berdasarkan Views
-        </Button>
-        <Button
-          className="flex-1"
-          variant={sort === "favorites" ? "primary" : "secondary"}
-          onClick={() => setSort("favorites")}
-        >
-          Berdasarkan Favorite
-        </Button>
+        <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5">
+          <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Ranking Mode</p>
+          <div className="mt-4 grid gap-3">
+            <Button
+              className="w-full"
+              variant={sort === "views" ? "primary" : "secondary"}
+              onClick={() => setSort("views")}
+            >
+              Berdasarkan Views
+            </Button>
+            <Button
+              className="w-full"
+              variant={sort === "favorites" ? "primary" : "secondary"}
+              onClick={() => setSort("favorites")}
+            >
+              Berdasarkan Favorite
+            </Button>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+            Ganti mode ranking tanpa pindah halaman. Layout desktop sekarang menaruh kontrol di panel samping agar grid tetap lega.
+          </p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <MangaCardSkeleton key={index} />
           ))}
@@ -75,7 +85,7 @@ export default function TopMangaPage() {
       ) : error ? (
         <EmptyState title="Top manga gagal dimuat" description={error} />
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
           {items.map((manga) => (
             <MangaCard key={manga.id} manga={manga} />
           ))}

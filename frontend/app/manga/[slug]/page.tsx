@@ -95,40 +95,46 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
 
   return (
     <section className="space-y-5">
-      <div className="relative aspect-[1.1] overflow-hidden rounded-[2rem] border border-[var(--line)] bg-[var(--surface)]">
-        {manga.cover ? (
-          <Image
-            src={manga.cover}
-            alt={manga.title}
-            fill
-            className="object-cover"
-            sizes="100vw"
-          />
-        ) : null}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-5">
-          <p className="text-[0.68rem] uppercase tracking-[0.32em] text-[var(--gold)]">Detail</p>
-          <h1 className="mt-2 text-2xl font-bold text-white">{manga.title}</h1>
-          <div className="mt-3 flex items-center gap-3 text-sm text-[var(--muted)]">
-            <span className="rounded-full bg-[var(--green)] px-3 py-1 text-xs font-semibold text-white">
-              {formatStatus(manga.status)}
-            </span>
-            <span className="flex items-center gap-1">
-              <EyeIcon className="h-4 w-4 text-[var(--gold)]" />
-              {formatViews(manga.views)} views
-            </span>
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_22rem]">
+        <div className="relative aspect-[1.1] overflow-hidden rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] xl:aspect-auto xl:min-h-[28rem]">
+          {manga.cover ? (
+            <Image
+              src={manga.cover}
+              alt={manga.title}
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+          ) : null}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-5 lg:p-7">
+            <p className="text-[0.68rem] uppercase tracking-[0.32em] text-[var(--gold)]">Detail</p>
+            <h1 className="mt-2 max-w-[36rem] text-2xl font-bold text-white lg:text-4xl">{manga.title}</h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--muted)]">
+              <span className="rounded-full bg-[var(--green)] px-3 py-1 text-xs font-semibold text-white">
+                {formatStatus(manga.status)}
+              </span>
+              <span className="flex items-center gap-1">
+                <EyeIcon className="h-4 w-4 text-[var(--gold)]" />
+                {formatViews(manga.views)} views
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Button onClick={() => void handleFavorite()} className="w-full">
-          <HeartIcon className="mr-2 h-4 w-4" />
-          Favorite
-        </Button>
-        <Button variant="secondary" className="w-full">
-          Slug: {manga.slug}
-        </Button>
+        <div className="space-y-4 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
+          <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Actions</p>
+          <Button onClick={() => void handleFavorite()} className="w-full">
+            <HeartIcon className="mr-2 h-4 w-4" />
+            Favorite
+          </Button>
+          <Button variant="secondary" className="w-full">
+            Slug: {manga.slug}
+          </Button>
+          <p className="text-sm leading-6 text-[var(--muted)]">
+            Simpan manga ke favorit atau tandai chapter terakhir untuk history baca.
+          </p>
+        </div>
       </div>
 
       <SectionHeading
@@ -145,7 +151,7 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
             className="flex w-full items-center justify-between rounded-[1.4rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-4 text-left"
           >
             <div>
-              <p className="text-sm font-semibold text-white">{chapter.title}</p>
+              <p className="text-sm font-semibold text-[var(--foreground)]">{chapter.title}</p>
               <p className="mt-1 text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
                 Chapter {chapter.number}
               </p>

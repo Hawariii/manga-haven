@@ -46,14 +46,25 @@ export default function FavoritePage() {
 
   return (
     <section className="space-y-5">
-      <SectionHeading
-        eyebrow="Favorite"
-        title="Daftar Simpanan"
-        description="Semua manga yang ditandai user sebagai favorit akan muncul di sini."
-      />
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6">
+          <SectionHeading
+            eyebrow="Favorite"
+            title="Daftar Simpanan"
+            description="Semua manga yang ditandai user sebagai favorit akan muncul di sini."
+          />
+        </div>
+        <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5">
+          <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Saved List</p>
+          <p className="mt-3 text-4xl font-bold text-[var(--foreground)]">{items.length}</p>
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+            Total manga yang saat ini masuk ke daftar favorit user.
+          </p>
+        </div>
+      </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <MangaCardSkeleton key={index} />
           ))}
@@ -71,7 +82,7 @@ export default function FavoritePage() {
           description="Saat user menyimpan manga favorit, daftar itu akan tampil di halaman ini."
         />
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
           {items.map((item) =>
             item.manga ? <MangaCard key={item.id} manga={item.manga} /> : null,
           )}

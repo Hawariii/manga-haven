@@ -122,115 +122,121 @@ export default function AdminMangaPage() {
 
   return (
     <section className="space-y-5">
-      <SectionHeading
-        eyebrow="Admin"
-        title="Admin Manga Panel"
-        description="Role admin bisa create manga baru dan upload chapter ke manga target."
-      />
+      <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6">
+        <SectionHeading
+          eyebrow="Admin"
+          title="Admin Manga Panel"
+          description="Role admin bisa create manga baru dan upload chapter ke manga target."
+        />
+      </div>
 
-      <form onSubmit={handleCreateManga} className="space-y-4">
-        <CoverUploadField value={mangaForm.cover} onSelect={setCoverFile} />
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+        <form onSubmit={handleCreateManga} className="space-y-4">
+          <CoverUploadField value={mangaForm.cover} onSelect={setCoverFile} />
 
-        <div className="space-y-3 rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] p-4">
-          <input
-            value={mangaForm.title}
-            onChange={(event) =>
-              setMangaForm((current) => ({
-                ...current,
-                title: event.target.value,
-                slug: syncSlug(event.target.value),
-              }))
-            }
-            placeholder="Judul manga"
-            className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none placeholder:text-[var(--muted)]"
-          />
-          <input
-            value={mangaForm.slug}
-            onChange={(event) => setMangaForm((current) => ({ ...current, slug: event.target.value }))}
-            placeholder="Slug manga"
-            className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none placeholder:text-[var(--muted)]"
-          />
-          <input
-            value={mangaForm.cover}
-            onChange={(event) => setMangaForm((current) => ({ ...current, cover: event.target.value }))}
-            placeholder="URL cover manga"
-            className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none placeholder:text-[var(--muted)]"
-          />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-3 rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] p-4">
             <input
-              value={mangaForm.status}
-              onChange={(event) => setMangaForm((current) => ({ ...current, status: event.target.value }))}
-              placeholder="Status"
-              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none placeholder:text-[var(--muted)]"
+              value={mangaForm.title}
+              onChange={(event) =>
+                setMangaForm((current) => ({
+                  ...current,
+                  title: event.target.value,
+                  slug: syncSlug(event.target.value),
+                }))
+              }
+              placeholder="Judul manga"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
             />
             <input
-              value={mangaForm.views}
-              onChange={(event) => setMangaForm((current) => ({ ...current, views: event.target.value }))}
-              placeholder="Views"
-              type="number"
-              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none placeholder:text-[var(--muted)]"
+              value={mangaForm.slug}
+              onChange={(event) => setMangaForm((current) => ({ ...current, slug: event.target.value }))}
+              placeholder="Slug manga"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
             />
-          </div>
-          <Button className="w-full" disabled={submittingManga || !mangaForm.cover}>
-            {submittingManga ? "Menyimpan manga..." : "Upload Manga"}
-          </Button>
-          {coverFile ? (
-            <p className="text-xs leading-5 text-[var(--gold)]">
-              Preview lokal aktif: {coverFile.name}
+            <input
+              value={mangaForm.cover}
+              onChange={(event) => setMangaForm((current) => ({ ...current, cover: event.target.value }))}
+              placeholder="URL cover manga"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                value={mangaForm.status}
+                onChange={(event) => setMangaForm((current) => ({ ...current, status: event.target.value }))}
+                placeholder="Status"
+                className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+              />
+              <input
+                value={mangaForm.views}
+                onChange={(event) => setMangaForm((current) => ({ ...current, views: event.target.value }))}
+                placeholder="Views"
+                type="number"
+                className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+              />
+            </div>
+            <Button className="w-full" disabled={submittingManga || !mangaForm.cover}>
+              {submittingManga ? "Menyimpan manga..." : "Upload Manga"}
+            </Button>
+            {coverFile ? (
+              <p className="text-xs leading-5 text-[var(--gold)]">
+                Preview lokal aktif: {coverFile.name}
+              </p>
+            ) : null}
+            <p className="text-xs leading-5 text-[var(--muted)]">
+              File cover lokal masih dipakai untuk preview. Penyimpanan file backend bisa disambung belakangan tanpa ubah flow admin.
             </p>
-          ) : null}
-          <p className="text-xs leading-5 text-[var(--muted)]">
-            File cover lokal masih dipakai untuk preview. Penyimpanan file backend bisa disambung belakangan tanpa ubah flow admin.
-          </p>
+          </div>
+        </form>
+
+        <div className="space-y-5">
+          <form
+            onSubmit={handleCreateChapter}
+            className="space-y-3 rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] p-4"
+          >
+            <h3 className="text-lg font-semibold text-[var(--foreground)]">Upload Chapter ke Manga Target</h3>
+            <select
+              value={chapterForm.mangaId}
+              onChange={(event) => setChapterForm((current) => ({ ...current, mangaId: event.target.value }))}
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none"
+            >
+              <option value="">Pilih manga target</option>
+              {mangaList.map((manga) => (
+                <option key={manga.id} value={manga.id}>
+                  {manga.title}
+                </option>
+              ))}
+            </select>
+
+            <input
+              value={chapterForm.title}
+              onChange={(event) => setChapterForm((current) => ({ ...current, title: event.target.value }))}
+              placeholder="Judul chapter"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            />
+            <input
+              value={chapterForm.number}
+              onChange={(event) => setChapterForm((current) => ({ ...current, number: event.target.value }))}
+              placeholder="Nomor chapter"
+              type="number"
+              className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            />
+            <Button className="w-full" variant="secondary" disabled={submittingChapter}>
+              {submittingChapter ? "Menyimpan chapter..." : "Upload Chapter"}
+            </Button>
+            {selectedManga ? (
+              <p className="text-xs leading-5 text-[var(--muted)]">
+                Target saat ini: <span className="font-semibold text-[var(--foreground)]">{selectedManga.title}</span>
+              </p>
+            ) : null}
+          </form>
+
+          <div className="rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] p-4">
+            <h3 className="text-lg font-semibold text-[var(--foreground)]">Manga Tersedia</h3>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              {loading ? "Memuat daftar manga..." : `${mangaList.length} manga siap dipilih untuk upload chapter.`}
+            </p>
+          </div>
         </div>
-      </form>
-
-      <form
-        onSubmit={handleCreateChapter}
-        className="space-y-3 rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] p-4"
-      >
-        <h3 className="text-lg font-semibold text-white">Upload Chapter ke Manga Target</h3>
-        <select
-          value={chapterForm.mangaId}
-          onChange={(event) => setChapterForm((current) => ({ ...current, mangaId: event.target.value }))}
-          className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none"
-        >
-          <option value="">Pilih manga target</option>
-          {mangaList.map((manga) => (
-            <option key={manga.id} value={manga.id}>
-              {manga.title}
-            </option>
-          ))}
-        </select>
-
-        <input
-          value={chapterForm.title}
-          onChange={(event) => setChapterForm((current) => ({ ...current, title: event.target.value }))}
-          placeholder="Judul chapter"
-          className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none placeholder:text-[var(--muted)]"
-        />
-        <input
-          value={chapterForm.number}
-          onChange={(event) => setChapterForm((current) => ({ ...current, number: event.target.value }))}
-          placeholder="Nomor chapter"
-          type="number"
-          className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-white outline-none placeholder:text-[var(--muted)]"
-        />
-        <Button className="w-full" variant="secondary" disabled={submittingChapter}>
-          {submittingChapter ? "Menyimpan chapter..." : "Upload Chapter"}
-        </Button>
-        {selectedManga ? (
-          <p className="text-xs leading-5 text-[var(--muted)]">
-            Target saat ini: <span className="font-semibold text-white">{selectedManga.title}</span>
-          </p>
-        ) : null}
-      </form>
-
-      <div className="rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] p-4">
-        <h3 className="text-lg font-semibold text-white">Manga Tersedia</h3>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          {loading ? "Memuat daftar manga..." : `${mangaList.length} manga siap dipilih untuk upload chapter.`}
-        </p>
       </div>
     </section>
   );

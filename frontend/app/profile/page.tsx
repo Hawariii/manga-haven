@@ -54,11 +54,13 @@ export default function ProfilePage() {
 
   return (
     <section className="space-y-5">
-      <SectionHeading
-        eyebrow="Profile"
-        title="Akun Pengguna"
-        description="Status login, info user, dan tombol logout disiapkan di halaman ini."
-      />
+      <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6">
+        <SectionHeading
+          eyebrow="Profile"
+          title="Akun Pengguna"
+          description="Status login, info user, dan tombol logout disiapkan di halaman ini."
+        />
+      </div>
 
       {loading ? (
         <div className="space-y-3 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
@@ -67,24 +69,36 @@ export default function ProfilePage() {
           <div className="h-10 w-full animate-pulse rounded-2xl bg-white/6" />
         </div>
       ) : user ? (
-        <div className="space-y-4 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-[1.4rem] bg-[linear-gradient(135deg,_rgba(255,224,120,0.28),_rgba(255,224,120,0.08))] text-xl font-black text-[var(--gold)]">
-              {user.name.slice(0, 1).toUpperCase()}
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_20rem]">
+          <div className="space-y-4 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[1.4rem] bg-[linear-gradient(135deg,_rgba(255,224,120,0.28),_rgba(255,224,120,0.08))] text-xl font-black text-[var(--gold)]">
+                {user.name.slice(0, 1).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-lg font-bold text-[var(--foreground)]">{user.name}</p>
+                <p className="text-sm text-[var(--muted)]">{user.email}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-lg font-bold text-white">{user.name}</p>
-              <p className="text-sm text-[var(--muted)]">{user.email}</p>
+
+            <div className="rounded-2xl border border-[var(--line)] bg-white/3 p-4 text-sm leading-6 text-[var(--muted)]">
+              Login aktif sebagai <span className="font-semibold text-[var(--foreground)]">{user.role}</span>. Guest tetap hanya bisa baca manga publik.
             </div>
+
+            <Button variant="danger" className="w-full xl:w-auto" onClick={() => void handleLogout()}>
+              Logout
+            </Button>
           </div>
 
-          <div className="rounded-2xl border border-[var(--line)] bg-white/3 p-4 text-sm leading-6 text-[var(--muted)]">
-            Login aktif sebagai <span className="font-semibold text-white">{user.role}</span>. Guest tetap hanya bisa baca manga publik.
+          <div className="rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
+            <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Access</p>
+            <p className="mt-3 text-4xl font-bold text-[var(--foreground)]">
+              {user.role === "admin" ? "Admin" : "User"}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+              Status akun aktif saat ini. Role menentukan akses ke panel admin dan endpoint terproteksi.
+            </p>
           </div>
-
-          <Button variant="danger" className="w-full" onClick={() => void handleLogout()}>
-            Logout
-          </Button>
         </div>
       ) : (
         <div className="space-y-4">
