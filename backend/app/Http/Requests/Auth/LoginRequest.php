@@ -19,4 +19,12 @@ class LoginRequest extends FormRequest
             'device_name' => ['nullable', 'string', 'max:255'],
         ];
     }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'email' => strtolower(trim((string) $this->input('email'))),
+            'device_name' => trim((string) $this->input('device_name')),
+        ]);
+    }
 }

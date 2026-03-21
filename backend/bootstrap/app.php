@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -42,5 +43,11 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => 'Resource not found.',
             ], 404);
+        });
+
+        $exceptions->render(function (TooManyRequestsHttpException $exception, Request $request) {
+            return response()->json([
+                'message' => 'Too many attempts. Please try again later.',
+            ], 429);
         });
     })->create();

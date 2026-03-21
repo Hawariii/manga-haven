@@ -34,9 +34,20 @@ api.interceptors.response.use(
 
 export function getApiErrorMessage(error: unknown) {
   if (axios.isAxiosError(error)) {
+    const validationErrors = error.response?.data?.errors;
+
+    if (validationErrors && typeof validationErrors === "object") {
+      const firstMessage = Object.values(validationErrors)
+        .flat()
+        .find((value) => typeof value === "string");
+
+      if (typeof firstMessage === "string" && firstMessage.length > 0) {
+        return firstMessage;
+      }
+    }
+
     return (
       error.response?.data?.message ||
-      error.response?.data?.errors?.[0] ||
       error.message ||
       "Terjadi kesalahan saat menghubungi server."
     );

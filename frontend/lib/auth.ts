@@ -7,6 +7,19 @@ const USER_KEY = "manga_haven_user";
 const COOKIE_KEY = "manga_haven_token";
 const ROLE_COOKIE_KEY = "manga_haven_role";
 
+function getCookieAttributes(maxAge: number) {
+  const secure = typeof window !== "undefined" && window.location.protocol === "https:";
+
+  return [
+    "path=/",
+    `max-age=${maxAge}`,
+    "samesite=strict",
+    secure ? "secure" : "",
+  ]
+    .filter(Boolean)
+    .join("; ");
+}
+
 export function getStoredToken() {
   if (typeof window === "undefined") {
     return null;
@@ -17,12 +30,12 @@ export function getStoredToken() {
 
 export function setStoredToken(token: string) {
   window.localStorage.setItem(TOKEN_KEY, token);
-  document.cookie = `${COOKIE_KEY}=${token}; path=/; max-age=2592000; samesite=lax`;
+  document.cookie = `${COOKIE_KEY}=${encodeURIComponent(token)}; ${getCookieAttributes(2592000)}`;
 }
 
 export function clearStoredToken() {
   window.localStorage.removeItem(TOKEN_KEY);
-  document.cookie = `${COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;
+  document.cookie = `${COOKIE_KEY}=; ${getCookieAttributes(0)}`;
 }
 
 export function getStoredUser() {
@@ -45,12 +58,12 @@ export function getStoredUser() {
 
 export function setStoredUser(user: User) {
   window.localStorage.setItem(USER_KEY, JSON.stringify(user));
-  document.cookie = `${ROLE_COOKIE_KEY}=${user.role}; path=/; max-age=2592000; samesite=lax`;
+  document.cookie = `${ROLE_COOKIE_KEY}=${encodeURIComponent(user.role)}; ${getCookieAttributes(2592000)}`;
 }
 
 export function clearStoredUser() {
   window.localStorage.removeItem(USER_KEY);
-  document.cookie = `${ROLE_COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;
+  document.cookie = `${ROLE_COOKIE_KEY}=; ${getCookieAttributes(0)}`;
 }
 
 export function clearSession() {

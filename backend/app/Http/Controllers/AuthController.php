@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
@@ -83,7 +84,22 @@ class AuthController extends Controller
 
     private function issueAuthResponse(User $user, string $deviceName, string $message, int $status = 200): JsonResponse
     {
+        $deviceName = Str::limit(trim($deviceName) ?: 'manga-haven', 255, '');
+
+        $user->tokens()
+            ->where('name', $deviceName)
+            ->delete();
+
         $token = $user->createToken($deviceName)->plainTextToken;
+
+        $staleTokenIds = $user->tokens()
+            ->latest('id')
+            ->skip(5)
+            ->pluck('id');
+
+        if ($staleTokenIds->isNotEmpty()) {
+            $user->tokens()->whereIn('id', $staleTokenIds)->delete();
+        }
 
         return $this->successResponse([
             'user' => new UserResource($user),
