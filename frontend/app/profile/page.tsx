@@ -69,7 +69,7 @@ export default function ProfilePage() {
           <div className="h-10 w-full animate-pulse rounded-2xl bg-white/6" />
         </div>
       ) : user ? (
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_20rem]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.72fr)]">
           <div className="space-y-4 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-[1.4rem] bg-[linear-gradient(135deg,_rgba(255,224,120,0.28),_rgba(255,224,120,0.08))] text-xl font-black text-[var(--gold)]">

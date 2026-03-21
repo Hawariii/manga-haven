@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useRef, useState } from "react";
 
 type ToastItem = {
   id: number;
@@ -16,11 +16,12 @@ const ToastContext = createContext<ToastContextType | null>(null);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const nextToastId = useRef(0);
 
   const value = useMemo(
     () => ({
       showToast(message: string, tone: ToastItem["tone"] = "default") {
-        const id = Date.now();
+        const id = ++nextToastId.current;
         setToasts((current) => [...current, { id, message, tone }]);
 
         window.setTimeout(() => {

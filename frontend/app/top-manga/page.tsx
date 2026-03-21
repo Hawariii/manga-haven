@@ -43,7 +43,7 @@ export default function TopMangaPage() {
 
   return (
     <section className="space-y-5">
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.72fr)]">
         <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6">
           <SectionHeading
             eyebrow="Top Manga"
