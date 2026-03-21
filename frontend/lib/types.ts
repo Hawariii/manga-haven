@@ -39,6 +39,8 @@ export type User = {
   name: string;
   email: string;
   role: "user" | "admin";
+  email_verified_at?: string | null;
+  is_email_verified?: boolean;
 };
 
 export type ApiResponse<T> = {

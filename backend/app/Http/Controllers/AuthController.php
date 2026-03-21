@@ -7,6 +7,10 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +24,9 @@ class AuthController extends Controller
             'role' => 'user',
         ]);
 
-        return $this->issueAuthResponse($user, $request->userAgent() ?: 'manga-haven', 'User registered successfully.', Response::HTTP_CREATED);
+        $user->sendEmailVerificationNotification();
+
+        return $this->issueAuthResponse($user, $request->userAgent() ?: 'manga-haven', 'User registered successfully. Please verify your email.', Response::HTTP_CREATED);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -68,6 +74,85 @@ class AuthController extends Controller
         return $this->successResponse([
             'user' => new UserResource(request()->user()),
         ]);
+    }
+
+    public function sendVerificationNotification(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        if ($user->hasVerifiedEmail()) {
+            return $this->successResponse(null, 'Email already verified.');
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return $this->successResponse(null, 'Verification email sent.');
+    }
+
+    public function verifyEmail(Request $request, int $id, string $hash): RedirectResponse
+    {
+        $user = User::findOrFail($id);
+        $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
+
+        if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return redirect()->away($frontendUrl.'/login?verified=invalid');
+        }
+
+        if (! $user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+            event(new Verified($user));
+        }
+
+        return redirect()->away($frontendUrl.'/login?verified=success');
+    }
+
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $status = Password::sendResetLink([
+            'email' => strtolower(trim((string) $validated['email'])),
+        ]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            return $this->errorResponse(__($status), Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return $this->successResponse(null, 'Password reset link sent.');
+    }
+
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)->letters()->mixedCase()->numbers()->uncompromised()],
+        ]);
+
+        $status = Password::reset(
+            [
+                'email' => strtolower(trim((string) $validated['email'])),
+                'password' => $validated['password'],
+                'password_confirmation' => $validated['password_confirmation'] ?? null,
+                'token' => $validated['token'],
+            ],
+            function (User $user, string $password): void {
+                $user->forceFill([
+                    'password' => $password,
+                ])->save();
+
+                $user->tokens()->delete();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return $this->errorResponse(__($status), Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return $this->successResponse(null, 'Password has been reset successfully.');
     }
 
     private function attemptLogin(LoginRequest $request): ?User
