@@ -26,6 +26,9 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const verifiedState = searchParams.get("verified");
+  const socialState = searchParams.get("social");
+  const socialReason = searchParams.get("reason");
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const config = {
     login: {
@@ -131,6 +134,13 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
           </div>
         ) : null}
 
+        {socialState === "google-error" ? (
+          <div className="rounded-2xl border border-red-400/20 bg-red-500/8 p-4 text-sm leading-6 text-[var(--muted)]">
+            Login Google gagal.
+            {socialReason ? ` ${socialReason}` : " Cek konfigurasi Google OAuth di backend lalu coba lagi."}
+          </div>
+        ) : null}
+
         {config.showName ? (
           <input
             value={form.name}
@@ -171,6 +181,18 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
         <Button className="w-full" type="submit" disabled={submitting}>
           {submitting ? "Memproses..." : config.submitText}
         </Button>
+
+        {backendUrl ? (
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = `${backendUrl}/auth/google/redirect`;
+            }}
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-2.5 text-sm font-semibold text-[var(--foreground)] transition active:scale-[0.98]"
+          >
+            Login dengan Google
+          </button>
+        ) : null}
 
         {config.forgotHref ? (
           <Link href={config.forgotHref} className="block text-right text-sm font-semibold text-[var(--gold)]">

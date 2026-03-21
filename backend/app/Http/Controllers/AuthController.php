@@ -6,6 +6,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,9 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Throwable;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class AuthController extends Controller
 {
@@ -110,6 +113,57 @@ class AuthController extends Controller
         return redirect()->away($frontendUrl.'/login?verified=success');
     }
 
+    public function redirectToGoogle(): RedirectResponse
+    {
+        return Socialite::driver('google')
+            ->stateless()
+            ->redirect();
+    }
+
+    public function handleGoogleCallback(): RedirectResponse
+    {
+        $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
+
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            $user = User::query()
+                ->where('google_id', $googleUser->getId())
+                ->orWhere('email', $googleUser->getEmail())
+                ->first();
+
+            if ($user) {
+                $user->update([
+                    'name' => $googleUser->getName() ?: $user->name,
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'email_verified_at' => $user->email_verified_at ?? now(),
+                ]);
+            } else {
+                $user = User::create([
+                    'name' => $googleUser->getName() ?: 'Google User',
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'password' => Hash::make(Str::password(32)),
+                    'role' => 'user',
+                    'email_verified_at' => now(),
+                ]);
+            }
+
+            $response = redirect()->away($frontendUrl.'/auth/callback?provider=google');
+
+            return $this->attachAuthCookiesToResponse(
+                $response,
+                $this->createAuthToken($user, 'google-oauth'),
+                $user->role
+            );
+        } catch (Throwable $exception) {
+            return redirect()->away($frontendUrl.'/login?social=google-error');
+        }
+    }
+
     public function forgotPassword(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -172,30 +226,19 @@ class AuthController extends Controller
 
     private function issueAuthResponse(User $user, string $deviceName, string $message, int $status = 200): JsonResponse
     {
-        $deviceName = Str::limit(trim($deviceName) ?: 'manga-haven', 255, '');
-
-        $user->tokens()
-            ->where('name', $deviceName)
-            ->delete();
-
-        $token = $user->createToken($deviceName)->plainTextToken;
-
-        $staleTokenIds = $user->tokens()
-            ->latest('id')
-            ->pluck('id')
-            ->slice(5)
-            ->values();
-
-        if ($staleTokenIds->isNotEmpty()) {
-            $user->tokens()->whereIn('id', $staleTokenIds)->delete();
-        }
-
         return $this->attachAuthCookies($this->successResponse([
             'user' => new UserResource($user),
-        ], $message, $status), $token, $user->role);
+        ], $message, $status), $this->createAuthToken($user, $deviceName), $user->role);
     }
 
     private function attachAuthCookies(JsonResponse $response, string $token, string $role): JsonResponse
+    {
+        $this->attachAuthCookiesToResponse($response, $token, $role);
+
+        return $response;
+    }
+
+    private function attachAuthCookiesToResponse(SymfonyResponse $response, string $token, string $role): SymfonyResponse
     {
         $minutes = 60 * 24 * 30;
         $secure = (bool) config('session.secure');
@@ -248,5 +291,28 @@ class AuthController extends Controller
         ));
 
         return $response;
+    }
+
+    private function createAuthToken(User $user, string $deviceName): string
+    {
+        $deviceName = Str::limit(trim($deviceName) ?: 'manga-haven', 255, '');
+
+        $user->tokens()
+            ->where('name', $deviceName)
+            ->delete();
+
+        $token = $user->createToken($deviceName)->plainTextToken;
+
+        $staleTokenIds = $user->tokens()
+            ->latest('id')
+            ->pluck('id')
+            ->slice(5)
+            ->values();
+
+        if ($staleTokenIds->isNotEmpty()) {
+            $user->tokens()->whereIn('id', $staleTokenIds)->delete();
+        }
+
+        return $token;
     }
 }

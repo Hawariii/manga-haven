@@ -53,6 +53,7 @@ export type User = {
   name: string;
   email: string;
   role: "user" | "admin";
+  avatar?: string | null;
   email_verified_at?: string | null;
   is_email_verified?: boolean;
 };
