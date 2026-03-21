@@ -21,7 +21,7 @@ function DesktopSidebar() {
   const { theme } = useTheme();
 
   return (
-    <aside className="desktop-sidebar hidden lg:sticky lg:top-28 lg:flex lg:w-[14.5rem] lg:flex-col lg:self-start lg:rounded-[2rem] lg:border lg:border-[var(--line)] lg:p-5 lg:shadow-[var(--page-shadow)]">
+    <aside className="desktop-sidebar hidden lg:sticky lg:top-32 lg:flex lg:w-[14.5rem] lg:flex-col lg:self-start lg:rounded-[2rem] lg:border lg:border-[var(--line)] lg:p-5 lg:shadow-[var(--page-shadow)]">
       <div className="mb-5">
         <div>
           <p className="text-[0.68rem] uppercase tracking-[0.32em] text-[var(--muted)]">Manga Haven</p>
@@ -71,9 +71,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ShellUiProvider>
       <div className="min-h-screen px-0 lg:px-5 lg:py-5">
         <NavbarTop />
-        <div className="desktop-shell lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)] lg:gap-5">
+        <div className="desktop-shell lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)] lg:gap-5 lg:pt-28">
           <DesktopSidebar />
-          <div className="app-frame">
+          <div className="app-frame lg:mt-3">
             <main className="content-safe px-4 lg:px-6">{children}</main>
             <NavbarBottom />
           </div>

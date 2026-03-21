@@ -98,6 +98,21 @@ export default function ProfilePage() {
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
               Status akun aktif saat ini. Role menentukan akses ke panel admin dan endpoint terproteksi.
             </p>
+            {user.role === "admin" ? (
+              <div className="mt-5 rounded-2xl border border-[var(--line)] bg-white/3 p-4">
+                <p className="text-sm font-semibold text-[var(--foreground)]">Panel Admin</p>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                  Upload manga baru, pilih manga target, lalu tambahkan chapter dari panel admin.
+                </p>
+                <Link href="/admin/manga" className="mt-4 block">
+                  <Button className="w-full">Buka Admin Panel</Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="mt-5 rounded-2xl border border-[var(--line)] bg-white/3 p-4 text-sm leading-6 text-[var(--muted)]">
+                Akun user bisa pakai history dan favorite, tapi tidak punya akses ke panel admin.
+              </div>
+            )}
           </div>
         </div>
       ) : (
