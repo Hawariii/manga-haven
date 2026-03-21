@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -66,7 +67,9 @@ class AuthController extends Controller
             $user?->tokens()->delete();
         }
 
-        return $this->successResponse(null, 'Logout successful.');
+        return $this->clearAuthCookies(
+            $this->successResponse(null, 'Logout successful.')
+        );
     }
 
     public function me(): JsonResponse
@@ -179,16 +182,71 @@ class AuthController extends Controller
 
         $staleTokenIds = $user->tokens()
             ->latest('id')
-            ->skip(5)
-            ->pluck('id');
+            ->pluck('id')
+            ->slice(5)
+            ->values();
 
         if ($staleTokenIds->isNotEmpty()) {
             $user->tokens()->whereIn('id', $staleTokenIds)->delete();
         }
 
-        return $this->successResponse([
+        return $this->attachAuthCookies($this->successResponse([
             'user' => new UserResource($user),
-            'token' => $token,
-        ], $message, $status);
+        ], $message, $status), $token, $user->role);
+    }
+
+    private function attachAuthCookies(JsonResponse $response, string $token, string $role): JsonResponse
+    {
+        $minutes = 60 * 24 * 30;
+        $secure = (bool) config('session.secure');
+        $sameSite = config('session.same_site', 'lax') ?: 'lax';
+        $domain = config('session.domain');
+
+        $response->headers->setCookie(
+            Cookie::make(
+                config('auth.token_cookie', 'manga_haven_token'),
+                $token,
+                $minutes,
+                '/',
+                $domain,
+                $secure,
+                true,
+                false,
+                $sameSite
+            )
+        );
+
+        $response->headers->setCookie(
+            Cookie::make(
+                config('auth.role_cookie', 'manga_haven_role'),
+                $role,
+                $minutes,
+                '/',
+                $domain,
+                $secure,
+                true,
+                false,
+                $sameSite
+            )
+        );
+
+        return $response;
+    }
+
+    private function clearAuthCookies(JsonResponse $response): JsonResponse
+    {
+        $response->headers->setCookie(Cookie::forget(
+            config('auth.token_cookie', 'manga_haven_token'),
+            '/',
+            config('session.domain')
+        ));
+
+        $response->headers->setCookie(Cookie::forget(
+            config('auth.role_cookie', 'manga_haven_role'),
+            '/',
+            config('session.domain')
+        ));
+
+        return $response;
     }
 }

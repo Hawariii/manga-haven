@@ -8,7 +8,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { useToast } from "@/components/providers/ToastProvider";
 import { Button } from "@/components/ui/Button";
 import { api, getApiErrorMessage } from "@/lib/api";
-import { getStoredToken } from "@/lib/auth";
+import { hasStoredSession } from "@/lib/auth";
 import { formatStatus, formatViews } from "@/lib/format";
 import type { ApiResponse, Manga } from "@/lib/types";
 
@@ -52,7 +52,7 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
       return;
     }
 
-    if (!getStoredToken()) {
+    if (!hasStoredSession()) {
       showToast("Login dulu untuk menambahkan favorite.", "error");
       return;
     }
@@ -66,7 +66,7 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
   }
 
   async function handleSaveHistory(chapterId: number) {
-    if (!manga || !getStoredToken()) {
+    if (!manga || !hasStoredSession()) {
       showToast("Login dulu untuk menyimpan history.", "error");
       return;
     }

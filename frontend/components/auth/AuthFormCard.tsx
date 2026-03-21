@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { useToast } from "@/components/providers/ToastProvider";
 import { Button } from "@/components/ui/Button";
 import { api, getApiErrorMessage } from "@/lib/api";
-import { setStoredToken, setStoredUser } from "@/lib/auth";
+import { setStoredUser } from "@/lib/auth";
 import type { ApiResponse, User } from "@/lib/types";
 
 type AuthFormCardProps = {
@@ -83,12 +83,11 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
               device_name: mode === "admin-login" ? "manga-haven-admin-panel" : "manga-haven-web",
             };
 
-      const response = await api.post<ApiResponse<{ token: string; user: User }>>(
+      const response = await api.post<ApiResponse<{ user: User }>>(
         config.endpoint,
         payload,
       );
 
-      setStoredToken(response.data.data.token);
       setStoredUser(response.data.data.user);
       showToast(response.data.message);
 

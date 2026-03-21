@@ -26,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/email/verification-notification', [AuthController::class, 'sendVerificationNotification'])
         ->middleware('throttle:verification-notification');
 
-    Route::middleware('verified')->group(function (): void {
+    Route::middleware('verified.api')->group(function (): void {
     Route::get('/history', [HistoryController::class, 'index']);
     Route::post('/history', [HistoryController::class, 'store']);
 

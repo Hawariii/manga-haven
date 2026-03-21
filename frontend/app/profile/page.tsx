@@ -8,7 +8,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { useToast } from "@/components/providers/ToastProvider";
 import { Button } from "@/components/ui/Button";
 import { api, getApiErrorMessage } from "@/lib/api";
-import { clearSession, getStoredToken, getStoredUser, setStoredUser } from "@/lib/auth";
+import { clearSession, getStoredUser, setStoredUser } from "@/lib/auth";
 import type { ApiResponse, User } from "@/lib/types";
 
 export default function ProfilePage() {
@@ -20,9 +20,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function loadProfile() {
-      const token = getStoredToken();
+      const storedUser = getStoredUser();
 
-      if (!token) {
+      if (!storedUser) {
         setLoading(false);
         return;
       }
@@ -43,7 +43,7 @@ export default function ProfilePage() {
 
   async function handleLogout() {
     try {
-      if (getStoredToken()) {
+      if (getStoredUser()) {
         await api.post("/logout");
       }
     } catch (err) {

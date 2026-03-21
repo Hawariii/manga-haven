@@ -17,8 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prependToGroup('api', [
+            \App\Http\Middleware\UseAccessTokenFromCookie::class,
+        ]);
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminOnly::class,
+            'verified.api' => \App\Http\Middleware\EnsureApiEmailIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

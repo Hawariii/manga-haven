@@ -7,7 +7,7 @@ import { MangaCardSkeleton } from "@/components/manga/MangaCardSkeleton";
 import { SectionHeading } from "@/components/SectionHeading";
 import { useToast } from "@/components/providers/ToastProvider";
 import { api, getApiErrorMessage } from "@/lib/api";
-import { getStoredToken } from "@/lib/auth";
+import { hasStoredSession } from "@/lib/auth";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import type { ApiResponse, FavoriteItem, PaginatedData } from "@/lib/types";
 
@@ -20,7 +20,7 @@ export default function FavoritePage() {
 
   useEffect(() => {
     async function loadFavorites() {
-      if (!getStoredToken()) {
+      if (!hasStoredSession()) {
         setLoading(false);
         return;
       }
@@ -69,10 +69,10 @@ export default function FavoritePage() {
             <MangaCardSkeleton key={index} />
           ))}
         </div>
-      ) : !getStoredToken() ? (
+      ) : !hasStoredSession() ? (
         <EmptyState
           title="Belum login"
-          description="Favorite list membutuhkan token Sanctum agar bisa memuat data user."
+          description="Favorite list membutuhkan sesi login aktif agar bisa memuat data user."
         />
       ) : error ? (
         <EmptyState title="Favorite gagal dimuat" description={error} />

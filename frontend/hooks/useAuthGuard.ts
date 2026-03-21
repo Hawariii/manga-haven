@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getStoredToken, isStoredAdmin } from "@/lib/auth";
+import { hasStoredSession, isStoredAdmin } from "@/lib/auth";
 
 type UseAuthGuardOptions = {
   adminOnly?: boolean;
@@ -12,7 +12,7 @@ type UseAuthGuardOptions = {
 export function useAuthGuard(options: UseAuthGuardOptions = {}) {
   const pathname = usePathname();
   const router = useRouter();
-  const isAuthenticated = typeof window !== "undefined" && Boolean(getStoredToken());
+  const isAuthenticated = typeof window !== "undefined" && hasStoredSession();
   const isAdmin = typeof window !== "undefined" && isStoredAdmin();
   const requiresAdmin = options.adminOnly ?? false;
   const redirectTo = options.redirectTo ?? (requiresAdmin ? "/admin/login" : "/profile");

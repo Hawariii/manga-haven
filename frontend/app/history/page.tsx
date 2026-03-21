@@ -7,7 +7,7 @@ import { MangaCardSkeleton } from "@/components/manga/MangaCardSkeleton";
 import { SectionHeading } from "@/components/SectionHeading";
 import { useToast } from "@/components/providers/ToastProvider";
 import { api, getApiErrorMessage } from "@/lib/api";
-import { getStoredToken } from "@/lib/auth";
+import { hasStoredSession } from "@/lib/auth";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import type { ApiResponse, HistoryItem, PaginatedData } from "@/lib/types";
 
@@ -20,7 +20,7 @@ export default function HistoryPage() {
 
   useEffect(() => {
     async function loadHistory() {
-      if (!getStoredToken()) {
+      if (!hasStoredSession()) {
         setLoading(false);
         return;
       }
@@ -69,10 +69,10 @@ export default function HistoryPage() {
             <MangaCardSkeleton key={index} />
           ))}
         </div>
-      ) : !getStoredToken() ? (
+      ) : !hasStoredSession() ? (
         <EmptyState
           title="Belum ada sesi login"
-          description="History akan muncul setelah token login Sanctum tersedia di browser."
+          description="History akan muncul setelah user login dan sesi cookie aktif."
         />
       ) : error ? (
         <EmptyState title="History gagal dimuat" description={error} />

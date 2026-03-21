@@ -20,6 +20,9 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
+    'token_cookie' => env('AUTH_TOKEN_COOKIE', 'manga_haven_token'),
+    'role_cookie' => env('AUTH_ROLE_COOKIE', 'manga_haven_role'),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
