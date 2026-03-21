@@ -16,12 +16,26 @@ class Manga extends Model
         'cover',
         'views',
         'status',
+        'description',
+        'author',
+        'artist',
+        'type',
+        'genres',
+        'release_year',
+        'country',
+        'banner',
+        'is_featured',
+        'is_published',
     ];
 
     protected function casts(): array
     {
         return [
             'views' => 'integer',
+            'genres' => 'array',
+            'release_year' => 'integer',
+            'is_featured' => 'boolean',
+            'is_published' => 'boolean',
         ];
     }
 

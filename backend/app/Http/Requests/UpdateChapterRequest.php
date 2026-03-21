@@ -29,6 +29,18 @@ class UpdateChapterRequest extends FormRequest
                     ->ignore($chapter?->id)
                     ->where(fn ($query) => $query->where('manga_id', $chapter?->manga_id)),
             ],
+            'slug' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:255',
+                'alpha_dash',
+                Rule::unique('chapters', 'slug')
+                    ->ignore($chapter?->id)
+                    ->where(fn ($query) => $query->where('manga_id', $chapter?->manga_id)),
+            ],
+            'published_at' => ['sometimes', 'nullable', 'date'],
+            'is_locked' => ['sometimes', 'boolean'],
         ];
     }
 }

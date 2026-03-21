@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -15,7 +15,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(getStoredUser());
   const [loading, setLoading] = useState(true);
   const [sendingVerification, setSendingVerification] = useState(false);
-  const searchParams = useSearchParams();
+  const router = useRouter();
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -60,6 +60,7 @@ export default function ProfilePage() {
       setSendingVerification(true);
       await api.post("/email/verification-notification");
       showToast("Email verifikasi sudah dikirim ulang.");
+      router.push(`/verify-email?email=${encodeURIComponent(user?.email ?? "")}&resent=1`);
     } catch (err) {
       showToast(getApiErrorMessage(err), "error");
     } finally {
@@ -100,12 +101,6 @@ export default function ProfilePage() {
                 >
                   {sendingVerification ? "Mengirim..." : "Kirim Ulang Verifikasi"}
                 </Button>
-              </div>
-            ) : null}
-
-            {searchParams.get("verify") === "1" ? (
-              <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/8 p-4 text-sm leading-6 text-[var(--muted)]">
-                Registrasi berhasil. Link verifikasi sudah dikirim ke email kamu.
               </div>
             ) : null}
 

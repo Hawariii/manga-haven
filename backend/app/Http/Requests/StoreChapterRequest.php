@@ -24,6 +24,17 @@ class StoreChapterRequest extends FormRequest
                     fn ($query) => $query->where('manga_id', $this->route('manga')->id)
                 ),
             ],
+            'slug' => [
+                'nullable',
+                'string',
+                'max:255',
+                'alpha_dash',
+                Rule::unique('chapters', 'slug')->where(
+                    fn ($query) => $query->where('manga_id', $this->route('manga')->id)
+                ),
+            ],
+            'published_at' => ['nullable', 'date'],
+            'is_locked' => ['nullable', 'boolean'],
         ];
     }
 }

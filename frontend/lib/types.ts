@@ -3,6 +3,10 @@ export type Chapter = {
   manga_id: number;
   title: string;
   number: number;
+  slug?: string | null;
+  published_at?: string | null;
+  is_locked?: boolean;
+  created_by?: number | null;
 };
 
 export type Manga = {
@@ -10,8 +14,18 @@ export type Manga = {
   title: string;
   slug: string;
   cover: string;
+  banner?: string | null;
   views: number;
   status: string;
+  description?: string | null;
+  author?: string | null;
+  artist?: string | null;
+  type?: string | null;
+  genres?: string[];
+  release_year?: number | null;
+  country?: string | null;
+  is_featured?: boolean;
+  is_published?: boolean;
   chapters_count?: number;
   favorites_count?: number;
   latest_chapter?: Chapter | null;

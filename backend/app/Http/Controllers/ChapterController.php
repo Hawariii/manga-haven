@@ -8,13 +8,20 @@ use App\Http\Resources\ChapterResource;
 use App\Models\Chapter;
 use App\Models\Manga;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class ChapterController extends Controller
 {
     public function store(StoreChapterRequest $request, Manga $manga): JsonResponse
     {
-        $chapter = $manga->chapters()->create($request->validated());
+        $validated = $request->validated();
+
+        $chapter = $manga->chapters()->create([
+            ...$validated,
+            'slug' => $validated['slug'] ?? Str::slug($validated['title'].'-'.$validated['number']),
+            'created_by' => $request->user()?->id,
+        ]);
 
         return $this->successResponse(
             new ChapterResource($chapter),
@@ -25,7 +32,18 @@ class ChapterController extends Controller
 
     public function update(UpdateChapterRequest $request, Chapter $chapter): JsonResponse
     {
-        $chapter->update($request->validated());
+        $validated = $request->validated();
+
+        if (
+            (array_key_exists('title', $validated) || array_key_exists('number', $validated))
+            && ! array_key_exists('slug', $validated)
+        ) {
+            $validated['slug'] = Str::slug(
+                ($validated['title'] ?? $chapter->title).'-'.($validated['number'] ?? $chapter->number)
+            );
+        }
+
+        $chapter->update($validated);
 
         return $this->successResponse(new ChapterResource($chapter->refresh()), 'Chapter updated successfully.');
     }

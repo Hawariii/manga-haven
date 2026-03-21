@@ -96,7 +96,7 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
       if (mode === "admin-login") {
         router.push(next || "/admin/manga");
       } else if (mode === "register") {
-        router.push("/profile?verify=1");
+        router.push(`/verify-email?email=${encodeURIComponent(response.data.data.user.email)}`);
       } else {
         router.push(next || "/profile");
       }

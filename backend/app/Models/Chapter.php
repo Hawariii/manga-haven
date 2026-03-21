@@ -11,12 +11,18 @@ class Chapter extends Model
         'manga_id',
         'title',
         'number',
+        'slug',
+        'published_at',
+        'is_locked',
+        'created_by',
     ];
 
     protected function casts(): array
     {
         return [
             'number' => 'decimal:2',
+            'published_at' => 'datetime',
+            'is_locked' => 'boolean',
         ];
     }
 

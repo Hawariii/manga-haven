@@ -8,6 +8,7 @@ use App\Http\Resources\MangaResource;
 use App\Models\Manga;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class MangaController extends Controller
@@ -17,18 +18,37 @@ class MangaController extends Controller
         $manga = Manga::query()
             ->withCount(['chapters', 'favorites'])
             ->with('latestChapter')
+            ->where('is_published', true)
             ->when(
                 $request->filled('q'),
                 fn ($query) => $query->where(function ($builder) use ($request) {
                     $search = $request->string('q')->toString();
                     $builder
                         ->where('title', 'like', "%{$search}%")
-                        ->orWhere('slug', 'like', "%{$search}%");
+                        ->orWhere('slug', 'like', "%{$search}%")
+                        ->orWhere('author', 'like', "%{$search}%")
+                        ->orWhere('artist', 'like', "%{$search}%");
                 })
             )
             ->when(
                 $request->filled('status'),
                 fn ($query) => $query->where('status', $request->string('status'))
+            )
+            ->when(
+                $request->filled('type'),
+                fn ($query) => $query->where('type', $request->string('type'))
+            )
+            ->when(
+                $request->filled('country'),
+                fn ($query) => $query->where('country', $request->string('country'))
+            )
+            ->when(
+                $request->filled('featured'),
+                fn ($query) => $query->where('is_featured', $request->boolean('featured'))
+            )
+            ->when(
+                $request->filled('genre'),
+                fn ($query) => $query->whereJsonContains('genres', $request->string('genre')->toString())
             )
             ->orderByDesc('created_at')
             ->paginate((int) $request->integer('per_page', 12));
@@ -41,6 +61,7 @@ class MangaController extends Controller
         $manga = Manga::query()
             ->withCount(['chapters', 'favorites'])
             ->with(['chapters', 'latestChapter'])
+            ->where('is_published', true)
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -56,6 +77,7 @@ class MangaController extends Controller
         $manga = Manga::query()
             ->withCount(['chapters', 'favorites'])
             ->with('latestChapter')
+            ->where('is_published', true)
             ->orderByDesc($sort === 'favorites' ? 'favorites_count' : 'views')
             ->limit((int) $request->integer('limit', 10))
             ->get();
@@ -65,9 +87,14 @@ class MangaController extends Controller
 
     public function store(StoreMangaRequest $request): JsonResponse
     {
+        $validated = $request->validated();
+
         $manga = Manga::create([
-            ...$request->validated(),
+            ...$validated,
+            'slug' => $validated['slug'] ?? Str::slug($validated['title']),
             'views' => $request->integer('views', 0),
+            'is_featured' => $request->boolean('is_featured'),
+            'is_published' => $request->has('is_published') ? $request->boolean('is_published') : true,
         ]);
 
         return $this->successResponse(
@@ -79,7 +106,13 @@ class MangaController extends Controller
 
     public function update(UpdateMangaRequest $request, Manga $manga): JsonResponse
     {
-        $manga->update($request->validated());
+        $validated = $request->validated();
+
+        if (array_key_exists('title', $validated) && ! array_key_exists('slug', $validated)) {
+            $validated['slug'] = Str::slug($validated['title']);
+        }
+
+        $manga->update($validated);
 
         return $this->successResponse(
             new MangaResource($manga->refresh()->loadCount(['chapters', 'favorites'])),

@@ -14,6 +14,10 @@ class ChapterResource extends JsonResource
             'manga_id' => $this->manga_id,
             'title' => $this->title,
             'number' => (float) $this->number,
+            'slug' => $this->slug,
+            'published_at' => $this->published_at?->toISOString(),
+            'is_locked' => (bool) $this->is_locked,
+            'created_by' => $this->created_by,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
