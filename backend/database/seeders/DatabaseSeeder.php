@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Chapter;
+use App\Models\ChapterPage;
 use App\Models\Favorite;
 use App\Models\History;
 use App\Models\Manga;
@@ -232,5 +233,26 @@ class DatabaseSeeder extends Seeder
                 );
             }
         }
+
+        Chapter::query()->with('manga')->get()->each(function (Chapter $chapter): void {
+            foreach (range(1, 6) as $pageNumber) {
+                ChapterPage::updateOrCreate(
+                    [
+                        'chapter_id' => $chapter->id,
+                        'page_number' => $pageNumber,
+                    ],
+                    [
+                        'image_url' => sprintf(
+                            'https://picsum.photos/seed/%s-%s-page-%s/1200/1800',
+                            $chapter->manga?->slug ?? 'manga',
+                            $chapter->slug ?? 'chapter',
+                            $pageNumber
+                        ),
+                        'width' => 1200,
+                        'height' => 1800,
+                    ]
+                );
+            }
+        });
     }
 }

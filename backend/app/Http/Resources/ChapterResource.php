@@ -18,6 +18,8 @@ class ChapterResource extends JsonResource
             'published_at' => $this->published_at?->toISOString(),
             'is_locked' => (bool) $this->is_locked,
             'created_by' => $this->created_by,
+            'pages_count' => $this->whenCounted('pages'),
+            'pages' => ChapterPageResource::collection($this->whenLoaded('pages')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

@@ -7,6 +7,17 @@ export type Chapter = {
   published_at?: string | null;
   is_locked?: boolean;
   created_by?: number | null;
+  pages_count?: number;
+  pages?: ChapterPage[];
+};
+
+export type ChapterPage = {
+  id: number;
+  chapter_id: number;
+  page_number: number;
+  image_url: string;
+  width?: number | null;
+  height?: number | null;
 };
 
 export type Manga = {
@@ -56,6 +67,25 @@ export type User = {
   avatar?: string | null;
   email_verified_at?: string | null;
   is_email_verified?: boolean;
+};
+
+export type ReaderPayload = {
+  manga: Pick<Manga, "id" | "title" | "slug" | "cover">;
+  chapter: Chapter;
+  navigation: {
+    previous?: {
+      id: number;
+      slug: string;
+      title: string;
+      number: number;
+    } | null;
+    next?: {
+      id: number;
+      slug: string;
+      title: string;
+      number: number;
+    } | null;
+  };
 };
 
 export type ApiResponse<T> = {

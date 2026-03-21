@@ -5,6 +5,7 @@ use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\MangaController;
+use App\Http\Controllers\ReaderController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:auth-register');
@@ -18,6 +19,7 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 
 Route::get('/manga', [MangaController::class, 'index']);
 Route::get('/manga/{slug}', [MangaController::class, 'show']);
+Route::get('/manga/{mangaSlug}/chapters/{chapterSlug}', [ReaderController::class, 'show']);
 Route::get('/top-manga', [MangaController::class, 'topManga']);
 
 Route::middleware('auth:sanctum')->group(function (): void {

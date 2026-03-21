@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import { EyeIcon, HeartIcon } from "@/components/icons";
 import { EmptyState } from "@/components/EmptyState";
@@ -174,9 +175,12 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
 
       <div className="space-y-3">
         {manga.chapters?.map((chapter) => (
-          <button
+          <Link
             key={chapter.id}
-            onClick={() => void handleSaveHistory(chapter.id)}
+            href={`/manga/${manga.slug}/chapters/${chapter.slug ?? chapter.id}`}
+            onClick={() => {
+              void handleSaveHistory(chapter.id);
+            }}
             className="flex w-full items-center justify-between rounded-[1.4rem] border border-[var(--line)] bg-[var(--surface)] px-4 py-4 text-left"
           >
             <div>
@@ -191,8 +195,8 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
                 ) : null}
               </div>
             </div>
-            <span className="text-xs font-semibold text-[var(--gold)]">Simpan</span>
-          </button>
+            <span className="text-xs font-semibold text-[var(--gold)]">Baca</span>
+          </Link>
         ))}
       </div>
     </section>

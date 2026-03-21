@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Chapter extends Model
 {
@@ -29,5 +30,10 @@ class Chapter extends Model
     public function manga(): BelongsTo
     {
         return $this->belongsTo(Manga::class);
+    }
+
+    public function pages(): HasMany
+    {
+        return $this->hasMany(ChapterPage::class)->orderBy('page_number');
     }
 }
