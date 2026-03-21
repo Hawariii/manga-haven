@@ -85,11 +85,16 @@ export default function TopMangaPage() {
       ) : error ? (
         <EmptyState title="Top manga gagal dimuat" description={error} />
       ) : (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
-          {items.map((manga) => (
-            <MangaCard key={manga.id} manga={manga} />
-          ))}
-        </div>
+        <>
+          <div className="rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-4 text-sm leading-6 text-[var(--muted)]">
+            Ranking sekarang menampilkan metadata konten juga, jadi admin bisa lihat campuran genre, tipe, dan author yang lagi dominan.
+          </div>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+            {items.map((manga) => (
+              <MangaCard key={manga.id} manga={manga} />
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

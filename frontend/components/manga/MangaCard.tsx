@@ -8,6 +8,7 @@ export function MangaCard({ manga }: { manga: Manga }) {
   const chapter = manga.latest_chapter?.number ?? manga.chapters_count ?? 0;
   const statusLabel = formatStatus(manga.status);
   const hasCover = Boolean(manga.cover);
+  const primaryGenre = manga.genres?.[0];
 
   return (
     <Link
@@ -41,9 +42,28 @@ export function MangaCard({ manga }: { manga: Manga }) {
       </div>
 
       <div className="space-y-2 px-3.5 pb-4 pt-3.5">
+        <div className="flex flex-wrap gap-2">
+          {manga.type ? (
+            <span className="rounded-full border border-[var(--line)] bg-white/4 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--gold)]">
+              {manga.type}
+            </span>
+          ) : null}
+          {primaryGenre ? (
+            <span className="rounded-full border border-[var(--line)] bg-white/4 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">
+              {primaryGenre}
+            </span>
+          ) : null}
+        </div>
+
         <h3 className="line-clamp-2 min-h-[2.75rem] text-sm font-semibold leading-5 text-[var(--foreground)]">
           {manga.title}
         </h3>
+
+        {(manga.author || manga.artist) ? (
+          <p className="line-clamp-1 text-[0.72rem] text-[var(--muted)]">
+            {[manga.author, manga.artist].filter(Boolean).join(" • ")}
+          </p>
+        ) : null}
 
         <div className="flex items-center justify-between text-[0.7rem] text-[var(--muted)]">
           <div className="flex items-center gap-1.5">

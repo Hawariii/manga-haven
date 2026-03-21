@@ -16,6 +16,8 @@ import type { ApiResponse, Manga, PaginatedData } from "@/lib/types";
 function HomePageContent() {
   const [items, setItems] = useState<Manga[]>([]);
   const [query, setQuery] = useState("");
+  const [genre, setGenre] = useState("");
+  const [contentType, setContentType] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,11 @@ function HomePageContent() {
 
   useEffect(() => {
     const incomingQuery = searchParams.get("q") ?? "";
+    const incomingGenre = searchParams.get("genre") ?? "";
+    const incomingType = searchParams.get("type") ?? "";
     setQuery(incomingQuery);
+    setGenre(incomingGenre);
+    setContentType(incomingType);
   }, [searchParams]);
 
   const loadManga = useCallback(async (nextPage: number) => {
@@ -43,7 +49,13 @@ function HomePageContent() {
 
     try {
       const response = await api.get<ApiResponse<PaginatedData<Manga>>>("/manga", {
-        params: { page: nextPage, per_page: 8, q: debouncedQuery || undefined },
+        params: {
+          page: nextPage,
+          per_page: 8,
+          q: debouncedQuery || undefined,
+          genre: genre || undefined,
+          type: contentType || undefined,
+        },
       });
 
       const payload = response.data.data;
@@ -60,7 +72,7 @@ function HomePageContent() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [debouncedQuery, showToast]);
+  }, [contentType, debouncedQuery, genre, showToast]);
 
   useEffect(() => {
     setItems([]);
@@ -134,6 +146,8 @@ function HomePageContent() {
               {query
                 ? `Menampilkan hasil untuk kata kunci "${query}".`
                 : "Menampilkan daftar update terbaru tanpa filter pencarian."}
+              {genre ? ` Genre aktif: ${genre}.` : ""}
+              {contentType ? ` Tipe aktif: ${contentType}.` : ""}
             </p>
           </div>
         </div>
@@ -151,6 +165,32 @@ function HomePageContent() {
             onChange={setQuery}
             placeholder="Cari manga favoritmu..."
           />
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <select
+            value={genre}
+            onChange={(event) => setGenre(event.target.value)}
+            className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none"
+          >
+            <option value="">Semua genre</option>
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Martial Arts">Martial Arts</option>
+            <option value="School">School</option>
+            <option value="Revenge">Revenge</option>
+          </select>
+          <select
+            value={contentType}
+            onChange={(event) => setContentType(event.target.value)}
+            className="w-full rounded-2xl border border-[var(--line)] bg-white/4 px-4 py-3 text-sm text-[var(--foreground)] outline-none"
+          >
+            <option value="">Semua tipe</option>
+            <option value="Donghua">Donghua</option>
+            <option value="Manga">Manga</option>
+            <option value="Manhwa">Manhwa</option>
+            <option value="Manhua">Manhua</option>
+          </select>
         </div>
       </div>
 

@@ -110,6 +110,21 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
           <div className="absolute inset-x-0 bottom-0 p-5 lg:p-7">
             <p className="text-[0.68rem] uppercase tracking-[0.32em] text-[var(--gold)]">Detail</p>
             <h1 className="mt-2 max-w-[36rem] text-2xl font-bold text-white lg:text-4xl">{manga.title}</h1>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {manga.type ? (
+                <span className="rounded-full border border-white/10 bg-black/35 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--gold)]">
+                  {manga.type}
+                </span>
+              ) : null}
+              {manga.genres?.map((genre) => (
+                <span
+                  key={genre}
+                  className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-[0.68rem] font-semibold text-white"
+                >
+                  {genre}
+                </span>
+              ))}
+            </div>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--muted)]">
               <span className="rounded-full bg-[var(--green)] px-3 py-1 text-xs font-semibold text-white">
                 {formatStatus(manga.status)}
@@ -124,6 +139,20 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
 
         <div className="space-y-4 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
           <p className="text-[0.68rem] uppercase tracking-[0.24em] text-[var(--gold)]">Actions</p>
+          <div className="rounded-2xl border border-[var(--line)] bg-white/3 p-4 text-sm leading-6 text-[var(--muted)]">
+            <p>
+              <span className="font-semibold text-[var(--foreground)]">Author:</span> {manga.author ?? "-"}
+            </p>
+            <p>
+              <span className="font-semibold text-[var(--foreground)]">Artist:</span> {manga.artist ?? "-"}
+            </p>
+            <p>
+              <span className="font-semibold text-[var(--foreground)]">Country:</span> {manga.country ?? "-"}
+            </p>
+            <p>
+              <span className="font-semibold text-[var(--foreground)]">Year:</span> {manga.release_year ?? "-"}
+            </p>
+          </div>
           <Button onClick={() => void handleFavorite()} className="w-full">
             <HeartIcon className="mr-2 h-4 w-4" />
             Favorite
@@ -140,7 +169,7 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
       <SectionHeading
         eyebrow="Chapters"
         title="Daftar Chapter"
-        description="Rute halaman ini sudah SEO-friendly karena memakai slug manga."
+        description={manga.description || "Rute halaman ini sudah SEO-friendly karena memakai slug manga."}
       />
 
       <div className="space-y-3">
@@ -152,9 +181,15 @@ export default function MangaDetailPage({ params }: MangaDetailPageProps) {
           >
             <div>
               <p className="text-sm font-semibold text-[var(--foreground)]">{chapter.title}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.24em] text-[var(--muted)]">
-                Chapter {chapter.number}
-              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
+                <span className="uppercase tracking-[0.24em]">Chapter {chapter.number}</span>
+                {chapter.published_at ? <span>{new Date(chapter.published_at).toLocaleDateString("id-ID")}</span> : null}
+                {chapter.is_locked ? (
+                  <span className="rounded-full border border-red-400/20 bg-red-500/10 px-2 py-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-red-200">
+                    Locked
+                  </span>
+                ) : null}
+              </div>
             </div>
             <span className="text-xs font-semibold text-[var(--gold)]">Simpan</span>
           </button>
