@@ -28,9 +28,7 @@ class AuthController extends Controller
             'role' => 'user',
         ]);
 
-        $user->sendEmailVerificationNotification();
-
-        return $this->issueAuthResponse($user, $request->userAgent() ?: 'manga-haven', 'User registered successfully. Please verify your email.', Response::HTTP_CREATED);
+        return $this->issueAuthResponse($user, $request->userAgent() ?: 'manga-haven', 'User registered successfully.', Response::HTTP_CREATED);
     }
 
     public function login(LoginRequest $request): JsonResponse

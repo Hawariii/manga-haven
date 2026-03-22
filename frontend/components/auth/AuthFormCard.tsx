@@ -25,7 +25,6 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
-  const verifiedState = searchParams.get("verified");
   const socialState = searchParams.get("social");
   const socialReason = searchParams.get("reason");
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -99,7 +98,7 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
       if (mode === "admin-login") {
         router.push(next || "/admin/manga");
       } else if (mode === "register") {
-        router.push(`/verify-email?email=${encodeURIComponent(response.data.data.user.email)}`);
+        router.push(next || "/profile");
       } else {
         router.push(next || "/profile");
       }
@@ -122,18 +121,6 @@ export function AuthFormCard({ mode }: AuthFormCardProps) {
         onSubmit={handleSubmit}
         className="space-y-3 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5"
       >
-        {mode === "login" && verifiedState === "success" ? (
-          <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/8 p-4 text-sm leading-6 text-[var(--muted)]">
-            Email berhasil diverifikasi. Sekarang kamu bisa login dan pakai fitur akun.
-          </div>
-        ) : null}
-
-        {mode === "login" && verifiedState === "invalid" ? (
-          <div className="rounded-2xl border border-red-400/20 bg-red-500/8 p-4 text-sm leading-6 text-[var(--muted)]">
-            Link verifikasi tidak valid atau sudah expired. Login dulu lalu kirim ulang email verifikasi dari halaman profile.
-          </div>
-        ) : null}
-
         {socialState === "google-error" ? (
           <div className="rounded-2xl border border-red-400/20 bg-red-500/8 p-4 text-sm leading-6 text-[var(--muted)]">
             Login Google gagal.

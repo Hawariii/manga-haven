@@ -28,7 +28,6 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/email/verification-notification', [AuthController::class, 'sendVerificationNotification'])
         ->middleware('throttle:verification-notification');
 
-    Route::middleware('verified.api')->group(function (): void {
     Route::get('/history', [HistoryController::class, 'index']);
     Route::post('/history', [HistoryController::class, 'store']);
 
@@ -44,6 +43,5 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/manga/{manga}/chapters', [ChapterController::class, 'store']);
         Route::match(['put', 'patch'], '/chapters/{chapter}', [ChapterController::class, 'update']);
         Route::delete('/chapters/{chapter}', [ChapterController::class, 'destroy']);
-    });
     });
 });

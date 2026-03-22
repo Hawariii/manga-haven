@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -14,8 +13,6 @@ import type { ApiResponse, User } from "@/lib/types";
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(getStoredUser());
   const [loading, setLoading] = useState(true);
-  const [sendingVerification, setSendingVerification] = useState(false);
-  const router = useRouter();
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -55,19 +52,6 @@ export default function ProfilePage() {
     }
   }
 
-  async function handleResendVerification() {
-    try {
-      setSendingVerification(true);
-      await api.post("/email/verification-notification");
-      showToast("Email verifikasi sudah dikirim ulang.");
-      router.push(`/verify-email?email=${encodeURIComponent(user?.email ?? "")}&resent=1`);
-    } catch (err) {
-      showToast(getApiErrorMessage(err), "error");
-    } finally {
-      setSendingVerification(false);
-    }
-  }
-
   return (
     <section className="space-y-5">
       <div className="rounded-[1.9rem] border border-[var(--line)] bg-[var(--surface)] p-5 lg:p-6">
@@ -87,23 +71,6 @@ export default function ProfilePage() {
       ) : user ? (
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.72fr)]">
           <div className="space-y-4 rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)] p-5">
-            {user.is_email_verified === false ? (
-              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/8 p-4 text-sm leading-6 text-[var(--muted)]">
-                <p className="font-semibold text-[var(--foreground)]">Email belum diverifikasi</p>
-                <p className="mt-1">
-                  Cek inbox email kamu lalu klik link verifikasi. Selama belum verified, history, favorite, dan panel admin akan ditahan.
-                </p>
-                <Button
-                  className="mt-4 w-full xl:w-auto"
-                  variant="secondary"
-                  disabled={sendingVerification}
-                  onClick={() => void handleResendVerification()}
-                >
-                  {sendingVerification ? "Mengirim..." : "Kirim Ulang Verifikasi"}
-                </Button>
-              </div>
-            ) : null}
-
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-[1.4rem] bg-[linear-gradient(135deg,_rgba(255,224,120,0.28),_rgba(255,224,120,0.08))] text-xl font-black text-[var(--gold)]">
                 {user.name.slice(0, 1).toUpperCase()}
@@ -131,12 +98,6 @@ export default function ProfilePage() {
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
               Status akun aktif saat ini. Role menentukan akses ke panel admin dan endpoint terproteksi.
             </p>
-            <div className="mt-4 rounded-2xl border border-[var(--line)] bg-white/3 p-4 text-sm leading-6 text-[var(--muted)]">
-              Email status:{" "}
-              <span className="font-semibold text-[var(--foreground)]">
-                {user.is_email_verified ? "Verified" : "Pending verification"}
-              </span>
-            </div>
             {user.role === "admin" ? (
               <div className="mt-5 rounded-2xl border border-[var(--line)] bg-white/3 p-4">
                 <p className="text-sm font-semibold text-[var(--foreground)]">Panel Admin</p>
