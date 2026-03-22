@@ -5,11 +5,22 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 
 type CoverUploadFieldProps = {
+  label?: string;
+  description?: string;
+  emptyText?: string;
+  inputId?: string;
   value?: string;
   onSelect?: (file: File | null) => void;
 };
 
-export function CoverUploadField({ value, onSelect }: CoverUploadFieldProps) {
+export function CoverUploadField({
+  label = "Cover Manga",
+  description = "Preview lokal aktif sebelum endpoint upload backend disambungkan.",
+  emptyText = "Preview gambar akan muncul di sini sebelum upload ke backend.",
+  inputId = "cover-upload",
+  value,
+  onSelect,
+}: CoverUploadFieldProps) {
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const previewUrl = localPreviewUrl ?? value ?? null;
 
@@ -35,11 +46,16 @@ export function CoverUploadField({ value, onSelect }: CoverUploadFieldProps) {
 
   return (
     <div className="space-y-4 rounded-[1.6rem] border border-[var(--line)] bg-[var(--surface)] p-4">
+      <div className="space-y-1">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[var(--gold)]">{label}</p>
+        <p className="text-xs leading-5 text-[var(--muted)]">{description}</p>
+      </div>
+
       <div className="relative aspect-[0.78] overflow-hidden rounded-[1.25rem] bg-black/40">
         {previewUrl ? (
           <Image
             src={previewUrl}
-            alt="Cover preview"
+            alt={`${label} preview`}
             fill
             unoptimized
             className="object-cover"
@@ -47,7 +63,7 @@ export function CoverUploadField({ value, onSelect }: CoverUploadFieldProps) {
           />
         ) : (
           <div className="flex h-full items-center justify-center px-6 text-center text-sm leading-6 text-[var(--muted)]">
-            Preview cover akan muncul di sini sebelum upload ke backend.
+            {emptyText}
           </div>
         )}
       </div>
@@ -58,16 +74,13 @@ export function CoverUploadField({ value, onSelect }: CoverUploadFieldProps) {
           accept="image/*"
           onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
           className="hidden"
-          id="cover-upload"
+          id={inputId}
         />
-        <label htmlFor="cover-upload" className="block">
+        <label htmlFor={inputId} className="block">
           <Button className="w-full" type="button">
-            Pilih Cover
+            Pilih Gambar
           </Button>
         </label>
-        <p className="text-xs leading-5 text-[var(--muted)]">
-          Struktur ini sudah siap dipakai saat endpoint upload cover backend ditambahkan.
-        </p>
       </div>
     </div>
   );

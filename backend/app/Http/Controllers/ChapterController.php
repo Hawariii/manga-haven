@@ -24,7 +24,7 @@ class ChapterController extends Controller
         ]);
 
         return $this->successResponse(
-            new ChapterResource($chapter),
+            new ChapterResource($chapter->loadCount('pages')),
             'Chapter created successfully.',
             Response::HTTP_CREATED
         );
@@ -45,7 +45,7 @@ class ChapterController extends Controller
 
         $chapter->update($validated);
 
-        return $this->successResponse(new ChapterResource($chapter->refresh()), 'Chapter updated successfully.');
+        return $this->successResponse(new ChapterResource($chapter->refresh()->loadCount('pages')), 'Chapter updated successfully.');
     }
 
     public function destroy(Chapter $chapter): JsonResponse

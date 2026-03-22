@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\ChapterPageController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\MangaController;
@@ -41,7 +42,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::delete('/manga/{manga}', [MangaController::class, 'destroy']);
 
         Route::post('/manga/{manga}/chapters', [ChapterController::class, 'store']);
+        Route::post('/chapters/{chapter}/pages', [ChapterPageController::class, 'store']);
         Route::match(['put', 'patch'], '/chapters/{chapter}', [ChapterController::class, 'update']);
         Route::delete('/chapters/{chapter}', [ChapterController::class, 'destroy']);
+        Route::delete('/chapter-pages/{chapterPage}', [ChapterPageController::class, 'destroy']);
     });
 });

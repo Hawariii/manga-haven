@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api, getApiErrorMessage } from "@/lib/api";
 import { setStoredUser } from "@/lib/auth";
 import type { ApiResponse, User } from "@/lib/types";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -25,4 +25,12 @@ export default function AuthCallbackPage() {
   }, [router, searchParams]);
 
   return <div className="h-40 animate-pulse rounded-[2rem] bg-white/6" />;
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="h-40 animate-pulse rounded-[2rem] bg-white/6" />}>
+      <AuthCallbackContent />
+    </Suspense>
+  );
 }

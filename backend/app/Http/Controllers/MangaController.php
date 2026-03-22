@@ -15,10 +15,15 @@ class MangaController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $isAdminRequest = $request->boolean('admin_all') && $request->user()?->role === 'admin';
+
         $manga = Manga::query()
             ->withCount(['chapters', 'favorites'])
-            ->with('latestChapter')
-            ->where('is_published', true)
+            ->with([
+                'latestChapter',
+                ...($isAdminRequest ? ['chapters' => fn ($query) => $query->withCount('pages')->with('pages')->orderByDesc('number')] : []),
+            ])
+            ->when(! $isAdminRequest, fn ($query) => $query->where('is_published', true))
             ->when(
                 $request->filled('q'),
                 fn ($query) => $query->where(function ($builder) use ($request) {
@@ -47,6 +52,10 @@ class MangaController extends Controller
                 fn ($query) => $query->where('is_featured', $request->boolean('featured'))
             )
             ->when(
+                $request->filled('published') && $isAdminRequest,
+                fn ($query) => $query->where('is_published', $request->boolean('published'))
+            )
+            ->when(
                 $request->filled('genre'),
                 fn ($query) => $query->whereJsonContains('genres', $request->string('genre')->toString())
             )
@@ -60,7 +69,7 @@ class MangaController extends Controller
     {
         $manga = Manga::query()
             ->withCount(['chapters', 'favorites'])
-            ->with(['chapters', 'latestChapter'])
+            ->with(['chapters' => fn ($query) => $query->withCount('pages')->orderByDesc('number'), 'latestChapter'])
             ->where('is_published', true)
             ->where('slug', $slug)
             ->firstOrFail();
